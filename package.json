@@ -1,9 +1,9 @@
 {
-  "name": "cordova-plugin-googlemaps",
+  "name": "cordova-plugin-googlemaps-applemaps",
   "version": “1.0.0”,
   "description": "Google Maps native SDK for Android and iOS (Apple Maps!)“,
   "cordova": {
-    "id": "cordova-plugin-googlemaps",
+    "id": "cordova-plugin-googlemaps-applemaps",
     "platforms": [
       "android",
       "ios"

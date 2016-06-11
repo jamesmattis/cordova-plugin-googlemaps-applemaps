@@ -1,8 +1,8 @@
 <?xml version='1.0' encoding='utf-8'?>
-<plugin id="cordova-plugin-googlemaps" version="1.0.0" xmlns="http://apache.org/cordova/ns/plugins/1.0" xmlns:android="http://schemas.android.com/apk/res/android">
-    <name>phonegap-googlemaps-plugin</name>
-    <js-module name="cordova-plugin-googlemaps" src="www/googlemaps-cdv-plugin.js">
-        <clobbers target="cordova-plugin-googlemaps" />
+<plugin id="cordova-plugin-googlemaps-applemaps" version="1.0.0" xmlns="http://apache.org/cordova/ns/plugins/1.0" xmlns:android="http://schemas.android.com/apk/res/android">
+    <name>phonegap-googlemaps-applemaps-plugin</name>
+    <js-module name="cordova-plugin-googlemaps-applemaps" src="www/googlemaps-cdv-plugin.js">
+        <clobbers target="cordova-plugin-googlemaps-applemaps" />
     </js-module>
 
 
@@ -98,10 +98,12 @@
         <info>
              In order to run this plugin, you need to obtain Google Maps API key for iOS.
              
-             Just kidding. This plugin replaces Google Maps with Native Apple Maps.
+             Just kidding. This plugin replaces Google Maps with Native Apple Maps. You don't need any Google API Key
+             
              Visit https://github.com/jamesmattis/cordoba-plugin-googlemaps-applemaps/wiki/Installation
 
              Check our release notes.
+             
              https://github.com/jamesmattis/cordoba-plugin-googlemaps-applemaps/wiki/Release-Notes
         </info>
 
@@ -189,6 +191,9 @@
         <header-file src="src/ios/GoogleMaps/MyPluginScrollView.h" />
         <source-file src="src/ios/GoogleMaps/MyPluginScrollView.m" />
 
+        <framework src="MapKit.framework" />
+        <framework src="CoreLocation.framework" />
+        
         <config-file target="*-Info.plist" parent="Google Maps API Key">
             <string>$API_KEY_FOR_IOS</string>
         </config-file>
