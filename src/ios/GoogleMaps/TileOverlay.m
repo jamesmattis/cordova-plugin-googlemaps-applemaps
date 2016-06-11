@@ -17,6 +17,7 @@
 
 -(void)createTileOverlay:(CDVInvokedUrlCommand *)command
 {
+    /*
   NSDictionary *json = [command.arguments objectAtIndex:1];
   NSString *tileUrlFormat = [json objectForKey:@"tileUrlFormat"];
 
@@ -53,7 +54,8 @@
   NSMutableDictionary *result = [[NSMutableDictionary alloc] init];
   [result setObject:id forKey:@"id"];
   [result setObject:[NSString stringWithFormat:@"%lu", (unsigned long)layer.hash] forKey:@"hashCode"];
-
+     */
+    
   CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:result];
   [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
 }
@@ -65,6 +67,7 @@
  */
 -(void)setVisible:(CDVInvokedUrlCommand *)command
 {
+    /*
   NSString *tileLayerKey = [command.arguments objectAtIndex:1];
   GMSTileLayer *layer = [self.mapCtrl getTileLayerByKey:tileLayerKey];
   Boolean isVisible = [[command.arguments objectAtIndex:2] boolValue];
@@ -73,7 +76,8 @@
   } else {
     layer.map = nil;
   }
-
+     */
+    
   CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
   [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
 }
@@ -85,13 +89,15 @@
  */
 -(void)remove:(CDVInvokedUrlCommand *)command
 {
+    /*
   NSString *tileLayerKey = [command.arguments objectAtIndex:1];
   GMSTileLayer *layer = [self.mapCtrl getTileLayerByKey:tileLayerKey];
   layer.map = nil;
   [layer clearTileCache];
   [self.mapCtrl removeObjectForKey:tileLayerKey];
   layer = nil;
-
+     */
+    
   CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
   [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
 }

@@ -17,6 +17,7 @@
 
 -(void)createGroundOverlay:(CDVInvokedUrlCommand *)command
 {
+    /*
     NSDictionary *json = [command.arguments objectAtIndex:1];
 
     NSArray *points = [json objectForKey:@"bounds"];
@@ -77,6 +78,7 @@
     } else {
         callback(nil);
     }
+     */
 }
 
 - (void)_setImage:(GMSGroundOverlay *)layer urlStr:(NSString *)urlStr completionHandler:(MYCompletionHandler)completionHandler {
@@ -155,6 +157,7 @@
  */
 -(void)remove:(CDVInvokedUrlCommand *)command
 {
+    /*
     NSString *key = [command.arguments objectAtIndex:1];
     GMSGroundOverlay *layer = [self.mapCtrl getGroundOverlayByKey:key];
     NSString *id = [NSString stringWithFormat:@"groundOverlay_icon_%lu", (unsigned long)layer.hash];
@@ -162,9 +165,10 @@
     [self.mapCtrl removeObjectForKey:key];
     [self.mapCtrl removeObjectForKey:id];
     layer = nil;
-
+     */
     CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
     [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+    
 }
 
 
@@ -174,6 +178,7 @@
  */
 -(void)setVisible:(CDVInvokedUrlCommand *)command
 {
+    /*
     NSString *key = [command.arguments objectAtIndex:1];
     GMSGroundOverlay *layer = [self.mapCtrl getGroundOverlayByKey:key];
     Boolean isVisible = [[command.arguments objectAtIndex:2] boolValue];
@@ -183,7 +188,7 @@
     } else {
         layer.map = nil;
     }
-
+     */
     CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
     [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
 }

@@ -33,35 +33,43 @@
 }
 
 - (void)setMyLocationEnabled:(CDVInvokedUrlCommand *)command {
+    /*
   Boolean isEnabled = [[command.arguments objectAtIndex:1] boolValue];
   self.mapCtrl.map.settings.myLocationButton = isEnabled;
   self.mapCtrl.map.myLocationEnabled = isEnabled;
-  
+  */
+    
   CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
   [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
 }
 
 - (void)setIndoorEnabled:(CDVInvokedUrlCommand *)command {
+    /*
   Boolean isEnabled = [[command.arguments objectAtIndex:1] boolValue];
   self.mapCtrl.map.settings.indoorPicker = isEnabled;
   self.mapCtrl.map.indoorEnabled = isEnabled;
-  
+  */
+    
   CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
   [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
 }
 
 - (void)setTrafficEnabled:(CDVInvokedUrlCommand *)command {
+    /*
   Boolean isEnabled = [[command.arguments objectAtIndex:1] boolValue];
   self.mapCtrl.map.trafficEnabled = isEnabled;
-  
+  */
+    
   CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
   [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
 }
 
 - (void)setCompassEnabled:(CDVInvokedUrlCommand *)command {
+    /*
   Boolean isEnabled = [[command.arguments objectAtIndex:1] boolValue];
   self.mapCtrl.map.settings.compassButton = isEnabled;
-  
+  */
+    
   CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
   [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
 }
@@ -74,9 +82,11 @@
 }
 
 - (void)setAllGesturesEnabled:(CDVInvokedUrlCommand *)command {
+    /*
   Boolean isEnabled = [[command.arguments objectAtIndex:1] boolValue];
   [self.mapCtrl.map.settings setAllGesturesEnabled:isEnabled];
-  
+  */
+    
   CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
   [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
 }
@@ -103,11 +113,13 @@
  * Pan by
  */
 - (void)panBy:(CDVInvokedUrlCommand *)command {
+    /*
   int x = [[command.arguments objectAtIndex:1] intValue];
   int y = [[command.arguments objectAtIndex:2] intValue];
   
   [self.mapCtrl.map animateWithCameraUpdate:[GMSCameraUpdate scrollByX:x * -1 Y:y * -1]];
-  
+  */
+    
   CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
   [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
 }
@@ -215,7 +227,6 @@
     */
     
     double zoom = [[json valueForKey:@"zoom"] doubleValue];
-  
   
     NSDictionary *latLng = nil;
     float latitude;
@@ -402,6 +413,7 @@
 
 - (void)toDataURL:(CDVInvokedUrlCommand *)command {
 
+    /*
   NSDictionary *opts = [command.arguments objectAtIndex:1];
   BOOL uncompress = NO;
   if ([opts objectForKey:@"uncompress"]) {
@@ -420,7 +432,8 @@
   NSData *imageData = UIImagePNGRepresentation(image);
   NSString *base64Encoded = nil;
   base64Encoded = [NSString stringWithFormat:@"data:image/png;base64,%@", [imageData base64EncodedStringWithSeparateLines:NO]];
-  
+  */
+    
   CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:base64Encoded];
   [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
 }
@@ -430,6 +443,7 @@
  */
 - (void)fromLatLngToPoint:(CDVInvokedUrlCommand*)command {
   
+    /*
   float latitude = [[command.arguments objectAtIndex:1] floatValue];
   float longitude = [[command.arguments objectAtIndex:2] floatValue];
   
@@ -439,7 +453,8 @@
   NSMutableArray *pointJSON = [[NSMutableArray alloc] init];
   [pointJSON addObject:[NSNumber numberWithDouble:point.x]];
   [pointJSON addObject:[NSNumber numberWithDouble:point.y]];
-  
+  */
+    
   CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsArray:pointJSON];
   [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
 }
@@ -449,6 +464,7 @@
  */
 - (void)fromPointToLatLng:(CDVInvokedUrlCommand*)command {
   
+    /*
   float pointX = [[command.arguments objectAtIndex:1] floatValue];
   float pointY = [[command.arguments objectAtIndex:2] floatValue];
   
@@ -458,7 +474,8 @@
   NSMutableArray *latLngJSON = [[NSMutableArray alloc] init];
   [latLngJSON addObject:[NSNumber numberWithDouble:latLng.latitude]];
   [latLngJSON addObject:[NSNumber numberWithDouble:latLng.longitude]];
-  
+  */
+    
   CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsArray:latLngJSON];
   [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
 }
@@ -468,6 +485,7 @@
  * Thanks @fschmidt
  */
 - (void)getVisibleRegion:(CDVInvokedUrlCommand*)command {
+    /*
   GMSVisibleRegion visibleRegion = self.mapCtrl.map.projection.visibleRegion;
   GMSCoordinateBounds *bounds = [[GMSCoordinateBounds alloc] initWithRegion:visibleRegion];
 
@@ -485,7 +503,8 @@
   [latLngArray addObject:northeast];
   [latLngArray addObject:southwest];
   [json setObject:latLngArray forKey:@"latLngArray"];
-
+*/
+    
   CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:json];
   [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
 }
@@ -952,6 +971,7 @@
 }
 
 - (void)getFocusedBuilding:(CDVInvokedUrlCommand*)command {
+    /*
   GMSIndoorBuilding *building = self.mapCtrl.map.indoorDisplay.activeBuilding;
   if (building != nil) {
     CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
@@ -977,7 +997,7 @@
   }
   [result setObject:levels forKey:@"levels"];
   
-  
+  */
   CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:result];
   [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
 }

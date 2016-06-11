@@ -251,13 +251,15 @@
  */
 -(void)isInfoWindowShown:(CDVInvokedUrlCommand *)command
 {
+    /*
     NSString *markerKey = [command.arguments objectAtIndex:1];
     GMSMarker *marker = [self.mapCtrl.overlayManager objectForKey:markerKey];
     Boolean isOpen = false;
     if (self.mapCtrl.map.selectedMarker == marker) {
         isOpen = YES;
     }
-
+     */
+    
     CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsBool:isOpen];
     [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
 }
@@ -438,6 +440,7 @@
  */
 -(void)setVisible:(CDVInvokedUrlCommand *)command
 {
+    /*
     NSString *markerKey = [command.arguments objectAtIndex:1];
     GMSMarker *marker = [self.mapCtrl.overlayManager objectForKey:markerKey];
     Boolean isVisible = [[command.arguments objectAtIndex:2] boolValue];
@@ -447,7 +450,8 @@
     } else {
         marker.map = nil;
     }
-
+     */
+    
     CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
     [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
 }
@@ -571,6 +575,7 @@
 -(void)setDropAnimation_:(GMSMarker *)marker pluginResult:(CDVPluginResult *)pluginResult callbackId:(NSString*)callbackId {
     int duration = 1;
 
+    /*
     CAKeyframeAnimation *longitudeAnim = [CAKeyframeAnimation animationWithKeyPath:@"longitude"];
     CAKeyframeAnimation *latitudeAnim = [CAKeyframeAnimation animationWithKeyPath:@"latitude"];
 
@@ -606,13 +611,15 @@
     }];
 
     [marker.layer addAnimation:group forKey:@"dropMarkerAnim"];
-
+     */
 }
 -(void)setBounceAnimation_:(GMSMarker *)marker pluginResult:(CDVPluginResult *)pluginResult callbackId:(NSString*)callbackId
 {
     /**
      * Marker drop animation
      */
+    
+    /*
     int duration = 1;
 
     CAKeyframeAnimation *longitudeAnim = [CAKeyframeAnimation animationWithKeyPath:@"longitude"];
@@ -651,6 +658,7 @@
     }];
 
     [marker.layer addAnimation:group forKey:@"bounceMarkerAnim"];
+     */
 }
 
 /**
@@ -806,12 +814,15 @@
                 marker.infoWindowAnchor = CGPointMake(anchorX, anchorY);
             }
 
+            /*
 
             // The `visible` property
             if (iconProperty[@"visible"]) {
                 marker.map = self.mapCtrl.map;
             }
 
+             */
+            
             if (animation) {
                 // Do animation, then send the result
                 [self setMarkerAnimation_:animation marker:marker pluginResult:pluginResult callbackId:callbackId];
@@ -845,11 +856,14 @@
 
                     if (!succeeded) {
 
+                        /*
                         // The `visible` property
                         if ([[iconProperty valueForKey:@"visible"] boolValue]) {
                             marker.map = self.mapCtrl.map;
                         }
 
+                         */
+                        
                         [self.commandDelegate sendPluginResult:pluginResult callbackId:callbackId];
                         return;
                     }
@@ -878,12 +892,14 @@
                             marker.infoWindowAnchor = CGPointMake(anchorX, anchorY);
                         }
 
+                        /*
                         // The `visible` property
                         if ([[iconProperty valueForKey:@"visible"] boolValue]) {
                             marker.map = self.mapCtrl.map;
                         }
 
-
+                         */
+                        
                         if (animation) {
                             // Do animation, then send the result
                             if (self.mapCtrl.debuggable) {
@@ -911,10 +927,12 @@
         UIColor *iconColor = [iconProperty valueForKey:@"iconColor"];
         marker.icon = [GMSMarker markerImageWithColor:iconColor];
         
+        /*
         // The `visible` property
         if ([[iconProperty valueForKey:@"visible"] boolValue]) {
             marker.map = self.mapCtrl.map;
         }
+        */
         
         if (animation) {
             // Do animation, then send the result

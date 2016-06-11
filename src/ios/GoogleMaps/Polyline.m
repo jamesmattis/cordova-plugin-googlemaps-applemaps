@@ -86,6 +86,8 @@
     NSString *id = [NSString stringWithFormat:@"polyline_%lu", (unsigned long)polyline.hash];
     [self.mapCtrl.overlayManager setObject:polyline forKey: id];
     
+    [self.mapCtrl.map addOverlay:polyline];
+    
     NSMutableDictionary *result = [[NSMutableDictionary alloc] init];
     [result setObject:id forKey:@"id"];
     [result setObject:[NSString stringWithFormat:@"%lu", (unsigned long)polyline.hash] forKey:@"hashCode"];
@@ -172,6 +174,7 @@
  */
 -(void)setVisible:(CDVInvokedUrlCommand *)command
 {
+    /*
   NSString *polylineKey = [command.arguments objectAtIndex:1];
   GMSPolyline *polyline = [self.mapCtrl getPolylineByKey: polylineKey];
   Boolean isVisible = [[command.arguments objectAtIndex:2] boolValue];
@@ -180,7 +183,8 @@
   } else {
     polyline.map = nil;
   }
-
+     */
+    
   CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
   [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
 }
@@ -205,11 +209,17 @@
  */
 -(void)remove:(CDVInvokedUrlCommand *)command
 {
-  NSString *polylineKey = [command.arguments objectAtIndex:1];
-  GMSPolyline *polyline = [self.mapCtrl getPolylineByKey: polylineKey];
-  polyline.map = nil;
-  [self.mapCtrl removeObjectForKey:polylineKey];
-  polyline = nil;
+    NSString *polylineKey = [command.arguments objectAtIndex:1];
+    
+    MKPolyline *polyline = [self.mapCtrl getPolylineByKey: polylineKey];
+
+    [self.mapCtrl removeObjectForKey:polylineKey];
+    [self.mapCtrl.map removeOverlay:polyline];
+    
+  //GMSPolyline *polyline = [self.mapCtrl getPolylineByKey: polylineKey];
+  //polyline.map = nil;
+  //[self.mapCtrl removeObjectForKey:polylineKey];
+  //polyline = nil;
 
   CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
   [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];

@@ -17,6 +17,7 @@
 
 -(void)createPolygon:(CDVInvokedUrlCommand *)command
 {
+    /*
   NSDictionary *json = [command.arguments objectAtIndex:1];
 
   GMSMutablePath *path = [GMSMutablePath path];
@@ -77,7 +78,7 @@
   NSMutableDictionary *result = [[NSMutableDictionary alloc] init];
   [result setObject:id forKey:@"id"];
   [result setObject:[NSString stringWithFormat:@"%lu", (unsigned long)polygon.hash] forKey:@"hashCode"];
-
+     */
   CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:result];
   [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
 }
@@ -209,6 +210,7 @@
  */
 -(void)setVisible:(CDVInvokedUrlCommand *)command
 {
+    /*
   NSString *polygonKey = [command.arguments objectAtIndex:1];
   GMSPolygon *polygon = [self.mapCtrl getPolygonByKey: polygonKey];
   Boolean isVisible = [[command.arguments objectAtIndex:2] boolValue];
@@ -217,7 +219,8 @@
   } else {
     polygon.map = nil;
   }
-
+     */
+    
   CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
   [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
 }
@@ -242,12 +245,14 @@
  */
 -(void)remove:(CDVInvokedUrlCommand *)command
 {
+    /*
   NSString *polygonKey = [command.arguments objectAtIndex:1];
   GMSPolygon *polygon = [self.mapCtrl getPolygonByKey: polygonKey];
   polygon.map = nil;
   [self.mapCtrl removeObjectForKey:polygonKey];
   polygon = nil;
-
+     */
+    
   CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
   [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
 }

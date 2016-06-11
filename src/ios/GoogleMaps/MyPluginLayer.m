@@ -80,7 +80,9 @@
     point.y -= offsetY;
     
     UIView *hitView =[self.mapCtrl.view hitTest:point withEvent:event];
-    NSString *hitClass = [NSString stringWithFormat:@"%@", [hitView class]];
+    //NSString *hitClass = [NSString stringWithFormat:@"%@", [hitView class]];
+      
+      /*
     if ([PluginUtil isIOS7_OR_OVER] &&
         [hitClass isEqualToString:@"UIButton"] &&
         self.mapCtrl.map.isMyLocationEnabled &&
@@ -92,6 +94,8 @@
         return nil;
       }
     }
+       */
+      
     return hitView;
   }
   

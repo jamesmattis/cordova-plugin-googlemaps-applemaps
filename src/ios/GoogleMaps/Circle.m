@@ -16,6 +16,7 @@
 }
 -(void)createCircle:(CDVInvokedUrlCommand *)command
 {
+    /*
   NSDictionary *json = [command.arguments objectAtIndex:1];
   NSDictionary *latLng = [json objectForKey:@"center"];
   float latitude = [[latLng valueForKey:@"lat"] floatValue];
@@ -46,7 +47,8 @@
   NSMutableDictionary *result = [[NSMutableDictionary alloc] init];
   [result setObject:id forKey:@"id"];
   [result setObject:[NSString stringWithFormat:@"%lu", (unsigned long)circle.hash] forKey:@"hashCode"];
-
+     */
+    
   CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:result];
   [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
 }
@@ -150,6 +152,7 @@
  */
 -(void)setVisible:(CDVInvokedUrlCommand *)command
 {
+    /*
   NSString *circleKey = [command.arguments objectAtIndex:1];
   GMSCircle *circle = [self.mapCtrl getCircleByKey: circleKey];
   Boolean isVisible = [[command.arguments objectAtIndex:2] boolValue];
@@ -158,7 +161,8 @@
   } else {
     circle.map = nil;
   }
-
+     */
+    
   CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
   [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
 }
@@ -169,12 +173,14 @@
  */
 -(void)remove:(CDVInvokedUrlCommand *)command
 {
+    /*
   NSString *circleKey = [command.arguments objectAtIndex:1];
   GMSCircle *circle = [self.mapCtrl getCircleByKey: circleKey];
   circle.map = nil;
   [self.mapCtrl removeObjectForKey:circleKey];
   circle = nil;
-
+     */
+    
   CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
   [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
 }
