@@ -239,6 +239,8 @@ NSDictionary *initOptions;
     
     [self.view addSubview:self.map];
     
+    NSLog(@"add map to self.view subviews %@", self.view.subviews);
+    
     // Init Tap & Long Press Recognizers
     
     self.tapRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tap:)];
@@ -759,28 +761,28 @@ NSDictionary *initOptions;
 
 - (void)mapViewWillStartLoadingMap:(MKMapView *)mapView
 {
-    
+    NSLog(@"mapViewWillStartLoadingMap");
 }
 
 - (void)mapViewDidFinishLoadingMap:(MKMapView *)mapView
 {
-    
+    NSLog(@"mapViewDidFinishLoadingMap");
 }
 
 - (void)mapViewDidFailLoadingMap:(MKMapView *)mapView
                        withError:(NSError *)error
 {
-    
+    NSLog(@"mapViewDidFailLoadingMap error: %@", error.debugDescription);
 }
 
 - (void)mapViewWillStartRenderingMap:(MKMapView *)mapView
 {
-    
+    NSLog(@"mapViewWillStartRenderingMap");
 }
 
 - (void)mapViewDidFinishRenderingMap:(MKMapView *)mapView fullyRendered:(BOOL)fullyRendered
 {
-    
+    NSLog(@"mapViewDidFinishRenderingMap");
 }
 
 #pragma mark - Tracking the User Location

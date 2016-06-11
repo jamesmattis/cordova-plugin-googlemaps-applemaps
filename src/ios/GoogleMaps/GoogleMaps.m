@@ -166,12 +166,14 @@
     }
     */
     
-    if (self.mapCtrl) {
+    if (self.mapCtrl)
+    {
         CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
         [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
         return;
-    } else {
-
+    }
+    else
+    {
         //dispatch_queue_t gueue = dispatch_queue_create("plugins.google.maps.init", NULL);
 
         // Create a map view
@@ -610,8 +612,8 @@
         if (self.locationManager == nil) {
             self.locationManager = [[CLLocationManager alloc] init];
         }
+        
         self.locationManager.delegate = self;
-
 
         //----------------------------------------------------
         // kCLAuthorizationStatusNotDetermined
