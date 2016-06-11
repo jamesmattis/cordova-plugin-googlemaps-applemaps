@@ -10,6 +10,8 @@
 #import "PluginUtil.h"
 #import <CoreLocation/CoreLocation.h>
 
+#import <MapKit/MapKit.h>
+
 @interface Geocoder : CDVPlugin
 
 @property (nonatomic, strong) CLGeocoder *geocoder;

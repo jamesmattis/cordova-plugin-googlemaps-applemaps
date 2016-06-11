@@ -12,6 +12,8 @@
 #import "TBXML.h"
 #import "MyPlgunProtocol.h"
 
+#import <MapKit/MapKit.h>
+
 @interface KmlOverlay : CDVPlugin<MyPlgunProtocol>
 
 @property (nonatomic, strong) GoogleMapsViewController* mapCtrl;

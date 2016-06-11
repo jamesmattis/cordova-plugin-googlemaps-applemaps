@@ -12,9 +12,16 @@
 #import "PluginUtil.h"
 #import "NSData+Base64.h"
 
-@interface GoogleMapsViewController : UIViewController<GMSMapViewDelegate, GMSIndoorDisplayDelegate>
+#import <MapKit/MapKit.h>
 
-@property (nonatomic, strong) GMSMapView* map;
+//@interface GoogleMapsViewController : UIViewController<GMSMapViewDelegate, GMSIndoorDisplayDelegate>
+@interface GoogleMapsViewController : UIViewController<MKMapViewDelegate, UIGestureRecognizerDelegate>
+
+@property (strong, nonatomic) MKMapView *map;
+@property (strong, nonatomic) UITapGestureRecognizer *tapRecognizer;
+@property (strong, nonatomic) UILongPressGestureRecognizer *longPressRecognizer;
+
+//@property (nonatomic, strong) GMSMapView* map;
 @property (nonatomic, strong) UIView* webView;
 @property (nonatomic, strong) NSMutableDictionary* overlayManager;
 @property (nonatomic, readwrite, strong) NSMutableDictionary* plugins;
@@ -27,6 +34,18 @@
 //- (UIView *)mapView:(GMSMapView *)mapView markerInfoWindow:(GMSMarker *)marker;
 - (id)initWithOptions:(NSDictionary *) options;
 
+// New Methods
+
+- (MKPointAnnotation *)getAnnotationByKey:(NSString *)key;
+- (MKShape *)getOverlayByKey:(NSString *)key;
+
+- (void)setZoom:(NSInteger)zoom;
+- (NSInteger)zoom;
+- (void)setCenterCoordinate:(CLLocationCoordinate2D)center zoom:(NSInteger)zoom animated:(BOOL)animated;
+
+// Old Methods
+
+/*
 - (GMSCircle *)getCircleByKey: (NSString *)key;
 - (GMSMarker *)getMarkerByKey: (NSString *)key;
 - (GMSPolygon *)getPolygonByKey: (NSString *)key;
@@ -34,6 +53,8 @@
 - (GMSTileLayer *)getTileLayerByKey: (NSString *)key;
 - (GMSGroundOverlay *)getGroundOverlayByKey: (NSString *)key;
 - (UIImage *)getUIImageByKey: (NSString *)key;
+*/
+
 - (void)updateMapViewLayout;
 
 - (void)removeObjectForKey: (NSString *)key;
@@ -41,4 +62,5 @@
 
 - (void) didChangeActiveBuilding: (GMSIndoorBuilding *)building;
 - (void) didChangeActiveLevel: (GMSIndoorLevel *)level;
+
 @end

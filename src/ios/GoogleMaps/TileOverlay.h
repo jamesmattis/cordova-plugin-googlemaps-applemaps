@@ -9,6 +9,8 @@
 #import "GoogleMaps.h"
 #import "MyPlgunProtocol.h"
 
+#import <MapKit/MapKit.h>
+
 @interface TileOverlay : CDVPlugin<MyPlgunProtocol>
 
 @property (nonatomic, strong) GoogleMapsViewController* mapCtrl;

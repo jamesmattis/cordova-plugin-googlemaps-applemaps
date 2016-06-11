@@ -15,6 +15,8 @@
 #import "MyReachability.h"
 #import "MyPluginScrollView.h"
 
+#import <MapKit/MapKit.h>
+
 @interface GoogleMaps : CDVPlugin<CLLocationManagerDelegate, UIScrollViewDelegate>
 
 @property (nonatomic, strong) GoogleMapsViewController* mapCtrl;

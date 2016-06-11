@@ -11,9 +11,154 @@
 #import <Cordova/CDVJSON.h>
 #endif
 
+#import "MarkerAnnotation.h"
+#import "PolylineOverlay.h"
+
+@interface GoogleMapsViewController ()
+
+-(void)imageForAnnotation:(MarkerAnnotation *)annotation imageBlock:(void( ^ )(UIImage* image))imageBlock;
+
+@end
 
 @implementation GoogleMapsViewController
 NSDictionary *initOptions;
+
+#pragma mark - Object by Key Handlers
+
+- (MKPointAnnotation *)getAnnotationByKey:(NSString *)key
+{
+    return [self.overlayManager objectForKey:key];
+}
+
+- (MKShape *)getOverlayByKey:(NSString *)key
+{
+    return [self.overlayManager objectForKey:key];
+}
+
+#pragma mark - Event Handlers
+
+/**
+ * Involve App._onCameraEvent
+ */
+
+ - (void)triggerCameraEvent: (NSString *)eventName position:(CLLocationCoordinate2D )position
+ {
+     NSMutableDictionary *target = [NSMutableDictionary dictionary];
+     [target setObject:@(position.latitude) forKey:@"lat"];
+     [target setObject:@(position.longitude) forKey:@"lng"];
+ 
+     NSMutableDictionary *json = [NSMutableDictionary dictionary];
+     [json setObject:@(0.0) forKey:@"bearing"];
+     [json setObject:target forKey:@"target"];
+     [json setObject:@(0.0) forKey:@"tilt"];
+     [json setObject:@((NSInteger)self.map.hash) forKey:@"hashCode"];
+     [json setObject:@(self.zoom) forKey:@"zoom"];
+ 
+     NSData* jsonData = [NSJSONSerialization dataWithJSONObject:json options:0 error:nil];
+     NSString* sourceArrayString = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
+     NSString* jsString = [NSString stringWithFormat:@"plugin.google.maps.Map._onCameraEvent('%@', %@);", eventName, sourceArrayString];
+ 
+     if ([self.webView respondsToSelector:@selector(stringByEvaluatingJavaScriptFromString:)])
+     {
+         [self.webView performSelector:@selector(stringByEvaluatingJavaScriptFromString:) withObject:jsString];
+     }
+     else if ([self.webView respondsToSelector:@selector(evaluateJavaScript:completionHandler:)])
+     {
+         [self.webView performSelector:@selector(evaluateJavaScript:completionHandler:) withObject:jsString withObject:nil];
+     }
+ }
+
+/**
+ * Involve App._onMapEvent
+ */
+
+- (void)triggerMapEvent: (NSString *)eventName coordinate:(CLLocationCoordinate2D)coordinate
+{
+    NSString* jsString = [NSString stringWithFormat:@"plugin.google.maps.Map._onMapEvent('%@', new window.plugin.google.maps.LatLng(%f,%f));",
+                          eventName, coordinate.latitude, coordinate.longitude];
+    
+    if ([self.webView respondsToSelector:@selector(stringByEvaluatingJavaScriptFromString:)])
+    {
+        [self.webView performSelector:@selector(stringByEvaluatingJavaScriptFromString:) withObject:jsString];
+    }
+    else if ([self.webView respondsToSelector:@selector(evaluateJavaScript:completionHandler:)])
+    {
+        [self.webView performSelector:@selector(evaluateJavaScript:completionHandler:) withObject:jsString withObject:nil];
+    }
+}
+
+/**
+ * Involve App._onMarkerEvent
+ */
+- (void)triggerMarkerEvent: (NSString *)eventName marker:(MKPointAnnotation *)marker
+{
+    NSString* jsString = [NSString stringWithFormat:@"plugin.google.maps.Map._onMarkerEvent('%@', 'marker_%lu');",
+                          eventName, (unsigned long)marker.hash];
+    
+    if ([self.webView respondsToSelector:@selector(stringByEvaluatingJavaScriptFromString:)])
+    {
+        [self.webView performSelector:@selector(stringByEvaluatingJavaScriptFromString:) withObject:jsString];
+    }
+    else if ([self.webView respondsToSelector:@selector(evaluateJavaScript:completionHandler:)])
+    {
+        [self.webView performSelector:@selector(evaluateJavaScript:completionHandler:) withObject:jsString withObject:nil];
+    }
+}
+
+/**
+ * Involve App._onOverlayEvent
+ */
+- (void)triggerOverlayEvent: (NSString *)eventName id:(NSString *) id
+{
+    NSString* jsString = [NSString stringWithFormat:@"plugin.google.maps.Map._onOverlayEvent('%@', '%@');",
+                          eventName, id];
+    
+    if ([self.webView respondsToSelector:@selector(stringByEvaluatingJavaScriptFromString:)])
+    {
+        [self.webView performSelector:@selector(stringByEvaluatingJavaScriptFromString:) withObject:jsString];
+    }
+    else if ([self.webView respondsToSelector:@selector(evaluateJavaScript:completionHandler:)])
+    {
+        [self.webView performSelector:@selector(evaluateJavaScript:completionHandler:) withObject:jsString withObject:nil];
+    }
+}
+
+#pragma mark - Gesture Recognizer Actions
+
+-(void)tap:(UIGestureRecognizer *)gestureRecognizer
+{
+    CGPoint tapPoint = [gestureRecognizer locationInView:self.map];
+    CLLocationCoordinate2D coordinate = [self.map convertPoint:tapPoint toCoordinateFromView:self.map];
+    
+    [self triggerMapEvent:@"click" coordinate:coordinate];
+}
+
+-(void)longPress:(UIGestureRecognizer *)gestureRecognizer
+{
+    CGPoint tapPoint = [gestureRecognizer locationInView:self.map];
+    CLLocationCoordinate2D coordinate = [self.map convertPoint:tapPoint toCoordinateFromView:self.map];
+    
+    [self triggerMapEvent:@"long_click" coordinate:coordinate];
+}
+
+#pragma mark - Gesture Recognizer Delegate
+
+- (BOOL)gestureRecognizerShouldBegin:(UIGestureRecognizer *)gestureRecognizer
+{
+    return YES;
+}
+
+- (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldReceiveTouch:(UITouch *)touch
+{
+    return YES;
+}
+
+- (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldRecognizeSimultaneouslyWithGestureRecognizer:(UIGestureRecognizer *)otherGestureRecognizer
+{
+    return YES;
+}
+
+#pragma mark - Init & View LifeCycle
 
 - (id)initWithOptions:(NSDictionary *) options {
     self = [super init];
@@ -49,7 +194,7 @@ NSDictionary *initOptions;
     // Initialize
     //------------
     self.overlayManager = [NSMutableDictionary dictionary];
-  
+    
     //------------------
     // Create a map view
     //------------------
@@ -74,7 +219,294 @@ NSDictionary *initOptions;
                                   viewingAngle:[[cameraOpts objectForKey:@"tilt"] doubleValue]];
     */
     
-  
+    // Create MKMapView
+    
+    self.map = [[MKMapView alloc] init];
+    
+    // Set Map Frame
+    
+    CGRect pluginRect = self.view.frame;
+    int marginBottom = 0;
+    CGRect mapRect = CGRectMake(0, 0, pluginRect.size.width, pluginRect.size.height  - marginBottom);
+    self.map.frame = mapRect;
+    self.map.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+    
+    // Set Map Delegate
+    
+    self.map.delegate = self;
+    
+    // Add Map as Subview of View
+    
+    [self.view addSubview:self.map];
+    
+    // Init Tap & Long Press Recognizers
+    
+    self.tapRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tap:)];
+    self.tapRecognizer.numberOfTapsRequired = 1;
+    self.tapRecognizer.delegate = self;
+    
+    [self.map addGestureRecognizer:self.tapRecognizer];
+    
+    self.longPressRecognizer = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(longPress:)];
+    self.longPressRecognizer.minimumPressDuration = 2.0;
+    self.longPressRecognizer.delegate = self;
+    
+    [self.map addGestureRecognizer:self.longPressRecognizer];
+    
+    // Set Map Options
+    
+    NSString *mapTypeString = [initOptions valueForKey:@"mapType"];
+    
+    if (mapTypeString)
+    {
+        if ([mapTypeString isEqualToString:@"NORMAL"] || [mapTypeString isEqualToString:@"MAP_TYPE_NORMAL"])
+        {
+            self.map.mapType = MKMapTypeStandard;
+        }
+        else if ([mapTypeString isEqualToString:@"ROADMAP"] || [mapTypeString isEqualToString:@"MAP_TYPE_NORMAL"])
+        {
+            self.map.mapType = MKMapTypeStandard;
+        }
+        else if ([mapTypeString isEqualToString:@"SATELLITE"] || [mapTypeString isEqualToString:@"MAP_TYPE_SATELLITE"])
+        {
+            self.map.mapType = MKMapTypeSatellite;
+        }
+        else if ([mapTypeString isEqualToString:@"HYBRID"] || [mapTypeString isEqualToString:@"MAP_TYPE_HYBRID"])
+        {
+            self.map.mapType = MKMapTypeHybrid;
+        }
+        else if ([mapTypeString isEqualToString:@"TERRAIN"] || [mapTypeString isEqualToString:@"MAP_TYPE_TERRAIN"])
+        {
+            self.map.mapType = MKMapTypeSatellite;
+        }
+        else if ([mapTypeString isEqualToString:@"NONE"] || [mapTypeString isEqualToString:@"MAP_TYPE_NONE"])
+        {
+            self.map.mapType = MKMapTypeStandard;
+        }
+        else
+        {
+            self.map.mapType = MKMapTypeStandard;
+        }
+    }
+    else
+    {
+        self.map.mapType = MKMapTypeStandard;
+    }
+    
+    // Set Gesture Options
+    
+    NSDictionary *gestures = [initOptions objectForKey:@"gestures"];
+    
+    if (gestures)
+    {
+        // Rotate
+        
+        BOOL isEnabled = NO;
+        
+        if ([gestures valueForKey:@"rotate"] != nil) {
+            isEnabled = [[gestures valueForKey:@"rotate"] boolValue];
+            self.map.rotateEnabled = isEnabled;
+        }
+        
+        // Scroll
+        
+        if ([gestures valueForKey:@"scroll"] != nil) {
+            isEnabled = [[gestures valueForKey:@"scroll"] boolValue];
+            self.map.scrollEnabled = isEnabled;
+        }
+        
+        // Tilt (Pitch on Apple Maps)
+        
+        if ([gestures valueForKey:@"tilt"] != nil) {
+            isEnabled = [[gestures valueForKey:@"tilt"] boolValue];
+            self.map.pitchEnabled = isEnabled;
+        }
+        
+        // Zoom
+        
+        if ([gestures valueForKey:@"zoom"] != nil) {
+            isEnabled = [[gestures valueForKey:@"zoom"] boolValue];
+            self.map.zoomEnabled= isEnabled;
+        }
+    }
+
+    // Get Camera (Region) Options
+    
+    NSDictionary *cameraOpts = [initOptions objectForKey:@"camera"];
+
+    if ([cameraOpts objectForKey:@"target"])
+    {
+        NSString *targetClsName = NSStringFromClass([[cameraOpts objectForKey:@"target"] class]);
+        
+        if ([targetClsName isEqualToString:@"__NSCFArray"] || [targetClsName isEqualToString:@"__NSArrayM"] )
+        {
+            NSArray *latLngList = [cameraOpts objectForKey:@"target"];
+            
+
+            float minLatitude = 0.0;
+            float maxLatitude = 0.0;
+            float minLongitude = 0.0;
+            float maxLongitude = 0.0;
+            float maxIndex = 0;
+            float minIndex = 0;
+            float latitudeDelta = 0.0;
+            float midLatitude = 0.0;
+            float longitudeDelta = 0.0;
+            float midLongitude = 0.0;
+            
+            float radiansConversion = (M_PI / 180.0);
+            
+            NSMutableArray *rotatedLongitudes = [[NSMutableArray alloc] init];
+            
+            for (NSInteger i = 0; i < [latLngList count]; i++)
+            {
+                NSDictionary *latLng = [latLngList objectAtIndex:i];
+                float latitude = [[latLng valueForKey:@"lat"] floatValue];
+                float longitude = [[latLng valueForKey:@"lng"] floatValue];
+                
+                if (latitude < minLatitude)
+                    minLatitude = latitude;
+                if (latitude > maxLatitude)
+                    maxLatitude = latitude;
+                
+                latitudeDelta = maxLatitude - minLatitude;
+                midLatitude = minLatitude + 0.5 * latitudeDelta;
+                
+                longitude += 180.0; // Rotate by 180 degrees
+                
+                [rotatedLongitudes addObject:@(longitude)];
+                
+                if (longitude < minLongitude)
+                {
+                    minLongitude = longitude ;
+                    minIndex = i;
+                }
+                if (longitude > maxLongitude)
+                {
+                    maxLongitude = longitude;
+                    maxIndex = i;
+                }
+            }
+            
+            // Check for 180th Meridian Crossing
+            
+            if ((cos(radiansConversion * maxLongitude) > 0 || cos(radiansConversion * minLongitude) > 0) && (signbit(sin(radiansConversion * maxLongitude)) != signbit(sin(radiansConversion * minLongitude))))
+            {
+                float maxRotatedLongitude = 0.0;
+                float minRotatedLongitude = 0.0;
+                NSInteger maxRotatedIndex = 0;
+                NSInteger minRotatedIndex = 0;
+                
+                for (NSInteger j = 0; j < [latLngList count]; j++)
+                {
+                    NSDictionary *latLng = [latLngList objectAtIndex:j];
+                    float longitude = [[latLng valueForKey:@"lng"] floatValue];
+                    
+                    longitude += 180.0; // Rotate by 180 degrees
+                    longitude *= (radiansConversion);
+                    longitude = sin(longitude);
+                    
+                    if (longitude < minRotatedLongitude)
+                    {
+                        minRotatedLongitude = longitude;
+                        minIndex = j;
+                    }
+                    if (longitude > maxRotatedLongitude)
+                    {
+                        maxRotatedLongitude = longitude;
+                        maxIndex = j;
+                    }
+                }
+                
+                if (maxRotatedIndex != minIndex || minRotatedIndex != maxIndex)
+                {
+                    // Swap Indicies
+                    
+                    maxIndex = maxRotatedIndex;
+                    minIndex = minRotatedIndex;
+                }
+                
+                maxLongitude = [[rotatedLongitudes objectAtIndex:maxIndex] floatValue];
+                minLongitude = [[rotatedLongitudes objectAtIndex:minIndex] floatValue];
+                
+                longitudeDelta = (360.0 - maxLongitude) + (minLongitude);
+                midLongitude = (minLongitude - 180.0) - 0.5 * longitudeDelta;
+                
+                if (longitudeDelta < 0.0)
+                    longitudeDelta *= -1.0;
+                
+                if (midLongitude < -180.0)
+                    midLongitude = (maxLongitude - 180.0) + 0.5 *longitudeDelta;
+            }
+            else
+            {
+                maxLongitude = [[rotatedLongitudes objectAtIndex:maxIndex] floatValue];
+                minLongitude = [[rotatedLongitudes objectAtIndex:minIndex] floatValue];
+                
+                longitudeDelta = maxLongitude - minLongitude;
+                midLongitude = (minLongitude - 180.0) + 0.5 * longitudeDelta;
+            }
+            
+            MKCoordinateRegion region = MKCoordinateRegionMake(CLLocationCoordinate2DMake(midLatitude, midLongitude), MKCoordinateSpanMake(latitudeDelta, longitudeDelta));
+            
+            [self.map setRegion:region];
+        }
+        else
+        {
+            NSMutableDictionary *latLng = [cameraOpts objectForKey:@"target"];
+            
+            float latitude = [[latLng valueForKey:@"lat"] floatValue];
+            float longitude = [[latLng valueForKey:@"lng"] floatValue];
+            
+            [self.map setCenterCoordinate:CLLocationCoordinate2DMake(latitude, longitude)];
+            
+            float zoom = [[cameraOpts valueForKey:@"zoom"] floatValue];
+            
+            [self setZoom:zoom];
+        }
+    }
+    else
+    {
+        [self.map setCenterCoordinate:CLLocationCoordinate2DMake(0.0, 0.0)];
+        
+        float zoom = [[cameraOpts valueForKey:@"zoom"] floatValue];
+        
+        [self setZoom:zoom];
+    }
+    
+    // Set Controls
+    
+    BOOL isEnabled = NO;
+
+    NSDictionary *controls = [initOptions objectForKey:@"controls"];
+    
+    if (controls)
+    {
+        // Compass
+        
+        BOOL isEnabled = NO;
+        
+        if ([controls valueForKey:@"compass"] != nil)
+        {
+            isEnabled = [[controls valueForKey:@"compass"] boolValue];
+            self.map.showsCompass = isEnabled;
+        }
+        
+        // My Location Button (User Location)
+        
+        if ([controls valueForKey:@"myLocationButton"] != nil)
+        {
+            isEnabled = [[controls valueForKey:@"myLocationButton"] boolValue];
+            self.map.showsUserLocation = isEnabled;
+        }
+
+    }
+    else
+    {
+        self.map.showsCompass = NO;
+    }
+    
+    /*
     NSDictionary *cameraOpts = [initOptions objectForKey:@"camera"];
     NSMutableDictionary *latLng = [NSMutableDictionary dictionary];
     [latLng setObject:[NSNumber numberWithFloat:0.0f] forKey:@"lat"];
@@ -131,7 +563,9 @@ NSDictionary *initOptions;
                               bearing:[[cameraOpts objectForKey:@"bearing"] doubleValue]
                               viewingAngle:[[cameraOpts objectForKey:@"tilt"] doubleValue]];
     }
-  
+    */
+    
+    /*
     CGRect pluginRect = self.view.frame;
     int marginBottom = 0;
     //if ([PluginUtil isIOS7] == false) {
@@ -147,8 +581,9 @@ NSDictionary *initOptions;
   
     //indoor display
     self.map.indoorDisplay.delegate = self;
+    */
   
-  
+    /*
     BOOL isEnabled = NO;
     //controls
     NSDictionary *controls = [initOptions objectForKey:@"controls"];
@@ -172,8 +607,9 @@ NSDictionary *initOptions;
     } else {
       self.map.settings.compassButton = TRUE;
     }
-
-  
+    */
+    
+    /*
     //gestures
     NSDictionary *gestures = [initOptions objectForKey:@"gestures"];
     if (gestures) {
@@ -198,7 +634,8 @@ NSDictionary *initOptions;
         self.map.settings.zoomGestures = isEnabled;
       }
     }
-  
+    */
+    /*
     //mapType
     NSString *typeStr = [initOptions valueForKey:@"mapType"];
     if (typeStr) {
@@ -220,7 +657,8 @@ NSDictionary *initOptions;
         self.map.mapType = mapType;
       }
     }
-  
+    */
+    /*
     [self.view addSubview: self.map];
   
     dispatch_async(dispatch_get_main_queue(), ^{
@@ -242,6 +680,7 @@ NSDictionary *initOptions;
 
       }
     });
+    */
 }
 
 
@@ -257,6 +696,7 @@ NSDictionary *initOptions;
  *         NO otherwise (i.e., the default behavior should occur). The default behavior is for the
  *         camera to move such that it is centered on the user location.
  */
+/*
 - (BOOL)didTapMyLocationButtonForMapView:(GMSMapView *)mapView {
 	NSString *jsString = @"plugin.google.maps.Map._onMapEvent('my_location_button_click');";
 	if ([self.webView respondsToSelector:@selector(stringByEvaluatingJavaScriptFromString:)]) {
@@ -266,25 +706,409 @@ NSDictionary *initOptions;
 	}
 	return NO;
 }
+*/
+
+#pragma mark - Set Zoom
+
+- (void)setZoom:(NSInteger)zoom
+{
+    [self setCenterCoordinate:self.map.centerCoordinate zoom:zoom animated:NO];
+}
+
+- (NSInteger)zoom
+{
+    return log2(360 * ((self.map.frame.size.width / 256) / self.map.region.span.longitudeDelta)) + 1;
+}
+
+- (void)setCenterCoordinate:(CLLocationCoordinate2D)centerCoordinate zoom:(NSInteger)zoom animated:(BOOL)animated
+{
+    MKCoordinateSpan span = MKCoordinateSpanMake(0, 360 / pow(2, zoom) * self.map.frame.size.width / 256);
+    [self.map setRegion:MKCoordinateRegionMake(centerCoordinate, span) animated:animated];
+}
+
+#pragma mark - MKMapViewDelegate
+
+#pragma mark - Responding to Map Position Changes
+
+- (void)mapView:(MKMapView *)mapView regionWillChangeAnimated:(BOOL)animated
+{
+    BOOL gesture = NO;
+    
+    dispatch_queue_t gueue = dispatch_queue_create("plugin.google.maps.Map._onMapEvent", NULL);
+    dispatch_sync(gueue, ^{
+        
+        NSString* jsString = [NSString stringWithFormat:@"plugin.google.maps.Map._onMapEvent('will_move', %@);", gesture ? @"true": @"false"];
+        
+        if ([self.webView respondsToSelector:@selector(stringByEvaluatingJavaScriptFromString:)])
+        {
+            [self.webView performSelector:@selector(stringByEvaluatingJavaScriptFromString:) withObject:jsString];
+        }
+        else if ([self.webView respondsToSelector:@selector(evaluateJavaScript:completionHandler:)])
+        {
+            [self.webView performSelector:@selector(evaluateJavaScript:completionHandler:) withObject:jsString withObject:nil];
+        }
+    });
+}
+
+- (void)mapView:(MKMapView *)mapView regionDidChangeAnimated:(BOOL)animated
+{
+    [self triggerCameraEvent:@"camera_change" position:mapView.region.center];
+}
+
+#pragma mark - Loading the Map Data
+
+- (void)mapViewWillStartLoadingMap:(MKMapView *)mapView
+{
+    
+}
+
+- (void)mapViewDidFinishLoadingMap:(MKMapView *)mapView
+{
+    
+}
+
+- (void)mapViewDidFailLoadingMap:(MKMapView *)mapView
+                       withError:(NSError *)error
+{
+    
+}
+
+- (void)mapViewWillStartRenderingMap:(MKMapView *)mapView
+{
+    
+}
+
+- (void)mapViewDidFinishRenderingMap:(MKMapView *)mapView fullyRendered:(BOOL)fullyRendered
+{
+    
+}
+
+#pragma mark - Tracking the User Location
+
+- (void)mapViewWillStartLocatingUser:(MKMapView *)mapView
+{
+    
+}
+
+- (void)mapViewDidStopLocatingUser:(MKMapView *)mapView
+{
+    
+}
+
+- (void)mapView:(MKMapView *)mapView didUpdateUserLocation:(MKUserLocation *)userLocation
+{
+    
+}
+
+- (void)mapView:(MKMapView *)mapView didFailToLocateUserWithError:(NSError *)error
+{
+    
+}
+
+- (void)mapView:(MKMapView *)mapView didChangeUserTrackingMode:(MKUserTrackingMode)mode animated:(BOOL)animated
+{
+    
+}
+
+#pragma mark - Managing the Annotation Views
+
+- (MKAnnotationView *)mapView:(MKMapView *)mapView viewForAnnotation:(id<MKAnnotation>)annotation
+{
+    // Create AnnotationIdentifier From Image URL
+    
+    MarkerAnnotation *marker = (MarkerAnnotation *)annotation;
+    
+    NSArray *components = [marker.iconURL componentsSeparatedByString:@"/"];
+    NSString *pngName = (NSString *)components.lastObject;
+    NSArray *pngComponents = [pngName componentsSeparatedByString:@"."];
+    NSString *imageName = (NSString *)pngComponents.firstObject;
+    
+    NSString *AnnotationIdentifier = [NSString stringWithFormat:@"%@Annotation", imageName];
+    
+    MKAnnotationView *annoView;
+    
+    annoView = (MKAnnotationView *)[mapView dequeueReusableAnnotationViewWithIdentifier:AnnotationIdentifier];
+    
+    if (!annoView)
+    {
+        annoView = [[MKAnnotationView alloc] initWithAnnotation:annotation reuseIdentifier:AnnotationIdentifier];
+        
+        if (marker.iconURL)
+        {
+            [self imageForAnnotation:marker imageBlock:^(UIImage *image) {
+                annoView.image = image;
+            }];
+        }
+    }
+    
+    annoView.annotation = annotation;
+    annoView.canShowCallout = YES;
+    annoView.draggable = marker.draggable;
+    
+    return annoView;
+}
+
+- (void)mapView:(MKMapView *)mapView didAddAnnotationViews:(NSArray<MKAnnotationView *> *)views
+{
+    
+}
+
+- (void)mapView:(MKMapView *)mapView annotationView:(MKAnnotationView *)view calloutAccessoryControlTapped:(UIControl *)control
+{
+    [self triggerMarkerEvent:@"info_click" marker:view.annotation];
+}
+
+#pragma mark - Dragging an Annotation View
+
+- (void)mapView:(MKMapView *)mapView annotationView:(MKAnnotationView *)annotationView didChangeDragState:(MKAnnotationViewDragState)newState fromOldState:(MKAnnotationViewDragState)oldState
+{
+    if (newState == MKAnnotationViewDragStateStarting)
+    {
+        [self triggerMarkerEvent:@"drag_start" marker:annotationView.annotation];
+    }
+    else if (newState == MKAnnotationViewDragStateEnding)
+    {
+        [self triggerMarkerEvent:@"drag_end" marker:annotationView.annotation];
+    }
+    else if (newState == MKAnnotationViewDragStateDragging)
+    {
+        [self triggerMarkerEvent:@"drag" marker:annotationView.annotation];
+    }
+}
+
+#pragma mark - Selecting Annotation UIAlertViewStyle
+
+- (void)mapView:(MKMapView *)mapView didSelectAnnotationView:(MKAnnotationView *)view
+{
+    [self triggerMarkerEvent:@"click" marker:view.annotation];
+}
+
+- (void)mapView:(MKMapView *)mapView didDeselectAnnotationView:(MKAnnotationView *)view
+{
+    
+}
+
+- (MKOverlayRenderer *)mapView:(MKMapView *)mapView rendererForOverlay:(id<MKOverlay>)overlay
+{
+    MKOverlayRenderer *renderer;
+    
+    if ([overlay isKindOfClass:[PolylineOverlay class]])
+    {
+        PolylineOverlay *polylineOverlay = (PolylineOverlay *) overlay;
+        
+        renderer = (MKOverlayRenderer *) [[MKPolylineRenderer alloc] initWithPolyline:overlay];
+        
+        ((MKOverlayPathRenderer *)renderer).strokeColor = polylineOverlay.strokeColor;
+        ((MKOverlayPathRenderer *)renderer).lineWidth = polylineOverlay.strokeWidth;
+
+        ((MKOverlayPathRenderer *)renderer).lineJoin = kCGLineJoinRound;
+        ((MKOverlayPathRenderer *)renderer).lineCap = kCGLineCapRound;
+    }
+    
+    return renderer;
+}
+
+- (void)mapView:(MKMapView *)mapView didAddOverlayRenderers:(NSArray<MKOverlayRenderer *> *)renderers
+{
+    
+}
+
+#pragma mark - Image For Annotation View
+
+-(void)imageForAnnotation:(MarkerAnnotation *)annotation imageBlock:(void( ^ )(UIImage* image))imageBlock
+{
+    NSString *iconPath = annotation.iconURL;
+    
+    CGFloat width = annotation.iconWidth;
+    CGFloat height = annotation.iconHeight;
+    
+    UIImage *image;
+    
+    if (iconPath)
+    {
+        NSRange range = [iconPath rangeOfString:@"http"];
+        
+        if (range.location != 0)
+        {
+            /**
+             * Load icon from file or Base64 encoded strings
+             */
+            
+            BOOL isTextMode = true;
+            
+            if ([iconPath rangeOfString:@"data:image/"].location != NSNotFound && [iconPath rangeOfString:@";base64,"].location != NSNotFound)
+            {
+                /**
+                 * Base64 icon
+                 */
+                
+                isTextMode = false;
+                
+                NSArray *tmp = [iconPath componentsSeparatedByString:@","];
+                
+                NSData *decodedData;
+#if !defined(__IPHONE_8_0)
+                if ([PluginUtil isIOS7_OR_OVER])
+                {
+                    decodedData = [NSData dataFromBase64String:tmp[1]];
+                }
+                else
+                {
+#if !defined(__IPHONE_7_0)
+                    decodedData = [[NSData alloc] initWithBase64Encoding:(NSString *)tmp[1]];
+#endif
+                }
+#else
+                decodedData = [NSData dataFromBase64String:tmp[1]];
+#endif
+                image = [[UIImage alloc] initWithData:decodedData];
+                
+                if (width > 0 && height > 0)
+                {
+                    image = [image resize:width height:height];
+                }
+                
+                imageBlock(image);
+            }
+            else
+            {
+                /**
+                 * Load the icon from local path
+                 */
+                
+                range = [iconPath rangeOfString:@"cdvfile://"];
+                
+                if (range.location != NSNotFound) {
+                    
+                    iconPath = [PluginUtil getAbsolutePathFromCDVFilePath:self.webView cdvFilePath:iconPath];
+                    
+                    if (iconPath == nil)
+                    {
+                        if (self.debuggable)
+                        {
+                            NSLog(@"(debug)Can not convert '%@' to device full path.", iconPath);
+                        }
+                        
+                        return;
+                    }
+                }
+                
+                
+                range = [iconPath rangeOfString:@"://"];
+                
+                if (range.location == NSNotFound)
+                {
+                    range = [iconPath rangeOfString:@"www/"];
+                
+                    if (range.location == NSNotFound)
+                    {
+                        iconPath = [NSString stringWithFormat:@"www/%@", iconPath];
+                    }
+                    
+                    range = [iconPath rangeOfString:@"/"];
+                    
+                    if (range.location != 0)
+                    {
+                        // Get the absolute path of the www folder.
+                        // https://github.com/apache/cordova-plugin-file/blob/1e2593f42455aa78d7fff7400a834beb37a0683c/src/ios/CDVFile.m#L506
+                    
+                        NSString *applicationDirectory = [[NSURL fileURLWithPath:[[NSBundle mainBundle] resourcePath]] absoluteString];
+                        
+                        iconPath = [NSString stringWithFormat:@"%@%@", applicationDirectory, iconPath];
+                    }
+                    else
+                    {
+                        iconPath = [NSString stringWithFormat:@"file://%@", iconPath];
+                    }
+                }
+                
+                range = [iconPath rangeOfString:@"file://"];
+                
+                if (range.location != NSNotFound)
+                {
+                    iconPath = [iconPath stringByReplacingOccurrencesOfString:@"file://" withString:@""];
+                
+                    NSFileManager *fileManager = [NSFileManager defaultManager];
+                    
+                    if (![fileManager fileExistsAtPath:iconPath])
+                    {
+                        if (self.debuggable)
+                        {
+                            NSLog(@"(debug)There is no file at '%@'.", iconPath);
+                        }
+                        
+                        return;
+                    }
+                }
+                
+                image = [UIImage imageNamed:iconPath];
+                
+                if (width > 0 && height > 0)
+                {
+                    image = [image resize:width height:height];
+                }
+                
+                imageBlock(image);
+            }
+        }
+        else
+        {
+            if (self.debuggable)
+            {
+                NSLog(@"---- Load the icon from the internet");
+            }
+            
+            /***
+             * Load the icon from the internet
+             */
+
+            dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INITIATED, 0), ^{
+                
+                NSURL *url = [NSURL URLWithString:iconPath];
+                
+                [self downloadImageWithURL:url completionBlock:^(BOOL succeeded, UIImage *image)
+                {
+                    if (!succeeded)
+                    {                        
+                        return;
+                    }
+                    
+                    if (width > 0 && height > 0)
+                    {
+                        image = [image resize:width height:height];
+                    }
+                    
+                    dispatch_async(dispatch_get_main_queue(), ^{
+                        imageBlock(image);
+                    });
+                }];
+            });
+        }
+    }
+}
 
 #pragma mark - GMSMapViewDelegate
 
 /**
  * @callback the my location button is clicked.
  */
+/*
 - (void)mapView:(GMSMapView *)mapView didTapAtCoordinate:(CLLocationCoordinate2D)coordinate {
   [self triggerMapEvent:@"click" coordinate:coordinate];
 }
+*/
 /**
  * @callback map long_click
  */
+/*
 - (void) mapView:(GMSMapView *)mapView didLongPressAtCoordinate:(CLLocationCoordinate2D)coordinate {
   [self triggerMapEvent:@"long_click" coordinate:coordinate];
 }
-
+*/
 /**
  * @callback map will_move
  */
+/*
 - (void) mapView:(GMSMapView *)mapView willMove:(BOOL)gesture
 {
   dispatch_queue_t gueue = dispatch_queue_create("plugin.google.maps.Map._onMapEvent", NULL);
@@ -298,55 +1122,66 @@ NSDictionary *initOptions;
 	  }
   });
 }
-
+*/
 
 /**
  * @callback map camera_change
  */
+/*
 - (void)mapView:(GMSMapView *)mapView didChangeCameraPosition:(GMSCameraPosition *)position {
   [self triggerCameraEvent:@"camera_change" position:position];
 }
+*/
 /**
  * @callback map camera_idle
  */
+/*
 - (void) mapView:(GMSMapView *)mapView idleAtCameraPosition:(GMSCameraPosition *)position
 {
   [self triggerCameraEvent:@"camera_idle" position:position];
 }
-
+*/
 
 /**
  * @callback marker info_click
  */
+/*
 - (void) mapView:(GMSMapView *)mapView didTapInfoWindowOfMarker:(GMSMarker *)marker
 {
   [self triggerMarkerEvent:@"info_click" marker:marker];
 }
+*/
 /**
  * @callback marker drag_start
  */
+/*
 - (void) mapView:(GMSMapView *) mapView didBeginDraggingMarker:(GMSMarker *)marker
 {
   [self triggerMarkerEvent:@"drag_start" marker:marker];
 }
+*/
 /**
  * @callback marker drag_end
  */
+/*
 - (void) mapView:(GMSMapView *) mapView didEndDraggingMarker:(GMSMarker *)marker
 {
   [self triggerMarkerEvent:@"drag_end" marker:marker];
 }
+*/
 /**
  * @callback marker drag
  */
+/*
 - (void) mapView:(GMSMapView *) mapView didDragMarker:(GMSMarker *)marker
 {
   [self triggerMarkerEvent:@"drag" marker:marker];
 }
-
+*/
 /**
  * @callback marker click
  */
+/*
 - (BOOL)mapView:(GMSMapView *)mapView didTapMarker:(GMSMarker *)marker {
   [self triggerMarkerEvent:@"click" marker:marker];
 
@@ -364,7 +1199,9 @@ NSDictionary *initOptions;
   }
 	return NO;
 }
+*/
 
+/*
 - (void)mapView:(GMSMapView *)mapView didTapOverlay:(GMSOverlay *)overlay {
   NSString *overlayClass = NSStringFromClass([overlay class]);
   if ([overlayClass isEqualToString:@"GMSPolygon"] ||
@@ -374,10 +1211,12 @@ NSDictionary *initOptions;
     [self triggerOverlayEvent:@"overlay_click" id:overlay.title];
   }
 }
+*/
 
 /**
  * Involve App._onMapEvent
  */
+/*
 - (void)triggerMapEvent: (NSString *)eventName coordinate:(CLLocationCoordinate2D)coordinate
 {
   NSString* jsString = [NSString stringWithFormat:@"plugin.google.maps.Map._onMapEvent('%@', new window.plugin.google.maps.LatLng(%f,%f));",
@@ -388,9 +1227,11 @@ NSDictionary *initOptions;
 		[self.webView performSelector:@selector(evaluateJavaScript:completionHandler:) withObject:jsString withObject:nil];
 	}
 }
+*/
 /**
  * Involve App._onCameraEvent
  */
+/*
 - (void)triggerCameraEvent: (NSString *)eventName position:(GMSCameraPosition *)position
 {
 
@@ -416,11 +1257,12 @@ NSDictionary *initOptions;
 		[self.webView performSelector:@selector(evaluateJavaScript:completionHandler:) withObject:jsString withObject:nil];
 	}
 }
-
+*/
 
 /**
  * Involve App._onMarkerEvent
  */
+/*
 - (void)triggerMarkerEvent: (NSString *)eventName marker:(GMSMarker *)marker
 {
   NSString* jsString = [NSString stringWithFormat:@"plugin.google.maps.Map._onMarkerEvent('%@', 'marker_%lu');",
@@ -431,10 +1273,11 @@ NSDictionary *initOptions;
 		[self.webView performSelector:@selector(evaluateJavaScript:completionHandler:) withObject:jsString withObject:nil];
 	}
 }
-
+*/
 /**
  * Involve App._onOverlayEvent
  */
+/*
 - (void)triggerOverlayEvent: (NSString *)eventName id:(NSString *) id
 {
   NSString* jsString = [NSString stringWithFormat:@"plugin.google.maps.Map._onOverlayEvent('%@', '%@');",
@@ -445,7 +1288,9 @@ NSDictionary *initOptions;
 		[self.webView performSelector:@selector(evaluateJavaScript:completionHandler:) withObject:jsString withObject:nil];
 	}
 }
+*/
 
+/*
 //future support: custom info window
 -(UIView *)mapView:(GMSMapView *)mapView markerInfoWindow:(GMSMarker*)marker
 {
@@ -811,12 +1656,13 @@ NSDictionary *initOptions;
   [imageView setImage:image];
   return imageView;
 }
+*/
 
+/*
 -(UIImage *)loadImageFromGoogleMap:(NSString *)fileName {
   NSString *imagePath = [[NSBundle bundleWithIdentifier:@"com.google.GoogleMaps"] pathForResource:fileName ofType:@"png"];
   return [[UIImage alloc] initWithContentsOfFile:imagePath];
 }
-
 
 - (void) didChangeActiveBuilding: (GMSIndoorBuilding *)building {
   //Notify to the JS
@@ -864,8 +1710,6 @@ NSDictionary *initOptions;
 	}
 }
 
-
-
 - (GMSCircle *)getCircleByKey: (NSString *)key {
   return [self.overlayManager objectForKey:key];
 }
@@ -890,8 +1734,35 @@ NSDictionary *initOptions;
 - (UIImage *)getUIImageByKey:(NSString *)key {
   return [self.overlayManager objectForKey:key];
 }
+*/
 
-- (void)removeObjectForKey: (NSString *)key {
+- (void)removeObjectForKey: (NSString *)key
+{
   [self.overlayManager removeObjectForKey:key];
 }
+
+#pragma mark - Download Image Async
+
+- (void)downloadImageWithURL:(NSURL *)url completionBlock:(void (^)(BOOL succeeded, UIImage *image))completionBlock
+{
+    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url];
+    
+    NSURLSession *session = [NSURLSession sharedSession];
+    
+    NSURLSessionDataTask *task = [session dataTaskWithRequest:request
+                                            completionHandler:^(NSData *data, NSURLResponse *response,  NSError *error) {
+                                                if ( !error )
+                                                {
+                                                    UIImage *image = [[UIImage alloc] initWithData:data];
+                                                    completionBlock(YES,image);
+                                                }
+                                                else
+                                                {
+                                                    completionBlock(NO,nil);
+                                                }
+                                            }];
+    
+    [task resume];
+}
+
 @end

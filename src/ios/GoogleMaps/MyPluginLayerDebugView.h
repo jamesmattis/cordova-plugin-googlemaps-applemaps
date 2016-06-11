@@ -8,6 +8,8 @@
 
 #import <UIKit/UIKit.h>
 
+#import <MapKit/MapKit.h>
+
 @interface MyPluginLayerDebugView : UIView
 @property (nonatomic) NSDictionary *embedRect;
 @property (nonatomic) UIView *webView;

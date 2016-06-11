@@ -53,6 +53,7 @@
     [self.viewController.view addSubview:self.pluginLayer];
 
 
+    /*
     NSString *APIKey = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"Google Maps API Key"];
     if (APIKey == nil) {
         NSDictionary *info = [[NSBundle mainBundle] infoDictionary];
@@ -68,6 +69,7 @@
     } else {
         [GMSServices provideAPIKey:APIKey];
     }
+    */
 }
 /**
  * @Private
@@ -75,8 +77,8 @@
  */
 -(void)versionCheck
 {
-    NSString *PLUGIN_VERSION = @"1.3.3";
-    NSLog(@"This app uses phonegap-googlemaps-plugin version %@", PLUGIN_VERSION);
+    NSString *PLUGIN_VERSION = @"1.0.0";
+    NSLog(@"This app uses phonegap-googlemaps-applemaps-plugin version %@", PLUGIN_VERSION);
 
     if ([PluginUtil isInDebugMode] == NO || [PluginUtil isIOS7_OR_OVER] == NO) {
         return;
@@ -147,6 +149,7 @@
  * Intialize the map
  */
 - (void)getMap:(CDVInvokedUrlCommand *)command {
+    /*
     NSString *APIKey = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"Google Maps API Key"];
     if (APIKey == nil) {
         NSDictionary *info = [[NSBundle mainBundle] infoDictionary];
@@ -161,7 +164,8 @@
         [alert show];
         return;
     }
-
+    */
+    
     if (self.mapCtrl) {
         CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
         [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
@@ -647,6 +651,16 @@
     }
 }
 
+#pragma mark - Location Manager Delegate
+
+- (void)locationManager:(CLLocationManager *)manager didChangeAuthorizationStatus:(CLAuthorizationStatus)status
+{
+    if (status == kCLAuthorizationStatusAuthorizedWhenInUse)
+    {
+        self.mapCtrl.map.showsUserLocation = YES;
+    }
+}
+
 -(void)locationManager:(CLLocationManager *)manager didUpdateLocations:(NSArray *)locations {
     NSMutableDictionary *latLng = [NSMutableDictionary dictionary];
     [latLng setObject:[NSNumber numberWithFloat:self.locationManager.location.coordinate.latitude] forKey:@"lat"];
@@ -708,7 +722,10 @@
  */
 - (void)clear:(CDVInvokedUrlCommand *)command {
     [self.mapCtrl.overlayManager removeAllObjects];
-    [self.mapCtrl.map clear];
+    [self.mapCtrl.map removeAnnotations:self.mapCtrl.map.annotations];
+    [self.mapCtrl.map removeOverlays:self.mapCtrl.map.overlays];
+
+    //[self.mapCtrl.map clear];
 
     CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
     [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
@@ -775,7 +792,11 @@
     [self.pluginLayer clearHTMLElement];
     [self.pluginScrollView.debugView clearHTMLElement];
     [self.mapCtrl.overlayManager removeAllObjects];
-    [self.mapCtrl.map clear];
+    //[self.mapCtrl.map clear];
+    
+    [self.mapCtrl.map removeAnnotations:self.mapCtrl.map.annotations];
+    [self.mapCtrl.map removeOverlays:self.mapCtrl.map.overlays];
+    
     [self.mapCtrl.map removeFromSuperview];
     [self.mapCtrl.view removeFromSuperview];
     self.mapCtrl.map = nil;

@@ -1,18 +1,18 @@
 <?xml version='1.0' encoding='utf-8'?>
-<plugin id="cordova-plugin-googlemaps" version="1.3.9" xmlns="http://apache.org/cordova/ns/plugins/1.0" xmlns:android="http://schemas.android.com/apk/res/android">
+<plugin id="cordova-plugin-googlemaps" version="1.0.0" xmlns="http://apache.org/cordova/ns/plugins/1.0" xmlns:android="http://schemas.android.com/apk/res/android">
     <name>phonegap-googlemaps-plugin</name>
     <js-module name="cordova-plugin-googlemaps" src="www/googlemaps-cdv-plugin.js">
         <clobbers target="cordova-plugin-googlemaps" />
     </js-module>
 
 
-    <description>Google Maps native SDK for Android and iOS</description>
-    <repo>https://github.com/mapsplugin/cordova-plugin-googlemaps</repo>
-    <issue>https://github.com/mapsplugin/cordova-plugin-googlemaps/issues</issue>
+    <description>Google Maps native SDK for Android and iOS (Apple Maps!)</description>
+    <repo>https://github.com/jamesmattis/cordoba-plugin-googlemaps-applemaps</repo>
+    <issue>https://github.com/jamesmattis/cordoba-plugin-googlemaps-applemaps/issues</issue>
 
     <license>Apache 2.0</license>
 
-    <keywords>google,maps,geo</keywords>
+    <keywords>google,apple,maps,geo</keywords>
 
     <engines>
       <engine name="cordova-android" version=">=5.1.0" />
@@ -25,10 +25,10 @@
 
         <info>
              In order to run this plugin, you need to obtain Google Maps API key for Android.
-             Visit https://github.com/mapsplugin/cordova-plugin-googlemaps/wiki/Installation
+             Visit https://github.com/jamesmattis/cordoba-plugin-googlemaps-applemaps/wiki/Installation
 
              Check our release notes.
-             https://github.com/wf9a5m75/phonegap-googlemaps-plugin/wiki/Release-Notes
+             https://github.com/jamesmattis/cordoba-plugin-googlemaps-applemaps/wiki/Release-Notes
         </info>
 
         <config-file target="res/xml/config.xml" parent="/*">
@@ -97,10 +97,12 @@
 
         <info>
              In order to run this plugin, you need to obtain Google Maps API key for iOS.
-             Visit https://github.com/mapsplugin/cordova-plugin-googlemaps/wiki/Installation
+             
+             Just kidding. This plugin replaces Google Maps with Native Apple Maps.
+             Visit https://github.com/jamesmattis/cordoba-plugin-googlemaps-applemaps/wiki/Installation
 
              Check our release notes.
-             https://github.com/mapsplugin/cordova-plugin-googlemaps/wiki/Release-Notes
+             https://github.com/jamesmattis/cordoba-plugin-googlemaps-applemaps/wiki/Release-Notes
         </info>
 
         <config-file target="config.xml" parent="/*">
@@ -160,6 +162,8 @@
         <source-file src="src/ios/GoogleMaps/Map.m" />
         <header-file src="src/ios/GoogleMaps/Marker.h" />
         <source-file src="src/ios/GoogleMaps/Marker.m" />
+        <header-file src="src/ios/GoogleMaps/MarkerAnnotation.h" />
+        <source-file src="src/ios/GoogleMaps/MarkerAnnotation.m" />
         <header-file src="src/ios/GoogleMaps/MyPlgunProtocol.h" />
         <header-file src="src/ios/GoogleMaps/PluginUtil.h" />
         <source-file src="src/ios/GoogleMaps/PluginUtil.m" />

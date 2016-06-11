@@ -17,6 +17,8 @@
 //#import "MFGoogleMapAdditions/GMSCoordinateBounds+Geometry.h"
 #import "GMSCoordinateBounds+Geometry.h"
 
+#import <MapKit/MapKit.h>
+
 typedef void (^MYCompletionHandler)(NSError *error);
 
 // Switch statement in Objective-C

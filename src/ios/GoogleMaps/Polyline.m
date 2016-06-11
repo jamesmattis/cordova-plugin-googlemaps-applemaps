@@ -8,6 +8,8 @@
 
 #import "Polyline.h"
 
+#import "PolylineOverlay.h"
+
 @implementation Polyline
 
 -(void)setGoogleMapsViewController:(GoogleMapsViewController *)viewCtrl
@@ -17,7 +19,36 @@
 
 -(void)createPolyline:(CDVInvokedUrlCommand *)command
 {
-  NSDictionary *json = [command.arguments objectAtIndex:1];
+    NSDictionary *json = [command.arguments objectAtIndex:1];
+    
+    NSArray *points = [json objectForKey:@"points"];
+
+    NSInteger count = points.count;
+    
+    NSMutableData *pointData = [[NSMutableData alloc] initWithLength:(count * sizeof(CLLocationCoordinate2D))];
+    
+    CLLocationCoordinate2D *coords = (CLLocationCoordinate2D *) pointData.bytes;
+    
+    double latitude, longitude;
+    NSDictionary *latLng;
+
+    for (NSInteger i = 0; i < count; i++)
+    {
+        latLng = [points objectAtIndex:i];
+        latitude = [[latLng objectForKey:@"lat"] floatValue];
+        longitude = [[latLng objectForKey:@"lng"] floatValue];
+        
+        coords[i] = CLLocationCoordinate2DMake(latitude, longitude);
+    }
+    
+    PolylineOverlay *polyline = [PolylineOverlay polylineWithCoordinates:coords count:count];
+    
+    NSArray *rgbColor = [json valueForKey:@"color"];
+    polyline.strokeColor = [rgbColor parsePluginColor];
+    
+    polyline.strokeWidth = [[json valueForKey:@"width"] floatValue];
+    
+    /*
   GMSMutablePath *path = [GMSMutablePath path];
 
   NSArray *points = [json objectForKey:@"points"];
@@ -30,7 +61,9 @@
 
   // Create the Polyline, and assign it to the map.
   GMSPolyline *polyline = [GMSPolyline polylineWithPath:path];
-
+     */
+    
+    /*
   if ([[json valueForKey:@"visible"] boolValue]) {
     polyline.map = self.mapCtrl.map;
   }
@@ -48,13 +81,17 @@
   NSString *id = [NSString stringWithFormat:@"polyline_%lu", (unsigned long)polyline.hash];
   [self.mapCtrl.overlayManager setObject:polyline forKey: id];
   polyline.title = id;
+    */
+    
+    NSString *id = [NSString stringWithFormat:@"polyline_%lu", (unsigned long)polyline.hash];
+    [self.mapCtrl.overlayManager setObject:polyline forKey: id];
+    
+    NSMutableDictionary *result = [[NSMutableDictionary alloc] init];
+    [result setObject:id forKey:@"id"];
+    [result setObject:[NSString stringWithFormat:@"%lu", (unsigned long)polyline.hash] forKey:@"hashCode"];
 
-  NSMutableDictionary *result = [[NSMutableDictionary alloc] init];
-  [result setObject:id forKey:@"id"];
-  [result setObject:[NSString stringWithFormat:@"%lu", (unsigned long)polyline.hash] forKey:@"hashCode"];
-
-  CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:result];
-  [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+    CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:result];
+    [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
 }
 
 

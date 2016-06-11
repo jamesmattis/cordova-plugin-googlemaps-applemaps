@@ -9,6 +9,8 @@
 #import <UIKit/UIKit.h>
 #import "MyPluginLayerDebugView.h"
 
+#import <MapKit/MapKit.h>
+
 @interface MyPluginScrollView : UIScrollView
 @property (nonatomic) MyPluginLayerDebugView *debugView;
 - (void)attachView:(UIView *)view;

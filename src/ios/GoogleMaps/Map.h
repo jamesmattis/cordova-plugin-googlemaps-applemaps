@@ -11,6 +11,8 @@
 //#import "NSData-Base64/NSData+Base64.h"
 #import "NSData+Base64.h"
 
+#import <MapKit/MapKit.h>
+
 @interface Map : CDVPlugin<MyPlgunProtocol>
 @property (nonatomic, strong) GoogleMapsViewController* mapCtrl;
 - (void)setTilt:(CDVInvokedUrlCommand*)command;

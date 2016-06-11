@@ -9,6 +9,8 @@
 #import "GoogleMaps.h"
 #import "MyPlgunProtocol.h"
 
+#import <MapKit/MapKit.h>
+
 @interface Circle : CDVPlugin<MyPlgunProtocol>
 @property (nonatomic, strong) GoogleMapsViewController* mapCtrl;
 - (void)createCircle:(CDVInvokedUrlCommand*)command;

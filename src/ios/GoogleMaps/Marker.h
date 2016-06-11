@@ -11,6 +11,8 @@
 #import "PluginUtil.h"
 #import "NSData+Base64.h"
 
+#import <MapKit/MapKit.h>
+
 @interface Marker : CDVPlugin<MyPlgunProtocol>
 @property (nonatomic, strong) GoogleMapsViewController* mapCtrl;
 - (void)createMarker:(CDVInvokedUrlCommand*)command;

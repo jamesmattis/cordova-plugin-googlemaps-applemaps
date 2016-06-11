@@ -10,6 +10,8 @@
 #import <GoogleMaps/GoogleMaps.h>
 #import "GoogleMapsViewController.h"
 
+#import <MapKit/MapKit.h>
+
 @interface MyPluginLayer : UIView
 
 @property (nonatomic) UIView *webView;

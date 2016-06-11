@@ -7,6 +7,7 @@
 //
 
 #import "PluginUtil.h"
+
 @implementation UIView (GoogleMapsPlugin)
 - (void)setFrameWithDictionary:(NSDictionary *)params
 {
