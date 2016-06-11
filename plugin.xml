@@ -162,8 +162,6 @@
         <source-file src="src/ios/GoogleMaps/Map.m" />
         <header-file src="src/ios/GoogleMaps/Marker.h" />
         <source-file src="src/ios/GoogleMaps/Marker.m" />
-        <header-file src="src/ios/GoogleMaps/MarkerAnnotation.h" />
-        <source-file src="src/ios/GoogleMaps/MarkerAnnotation.m" />
         <header-file src="src/ios/GoogleMaps/MyPlgunProtocol.h" />
         <header-file src="src/ios/GoogleMaps/PluginUtil.h" />
         <source-file src="src/ios/GoogleMaps/PluginUtil.m" />
@@ -188,6 +186,11 @@
         <source-file src="src/ios/GoogleMaps/MyPluginLayerDebugView.m" />
         <header-file src="src/ios/GoogleMaps/MyPluginScrollView.h" />
         <source-file src="src/ios/GoogleMaps/MyPluginScrollView.m" />
+
+        <header-file src="src/ios/GoogleMaps/MarkerAnnotation.h" />
+        <source-file src="src/ios/GoogleMaps/MarkerAnnotation.m" />
+        <header-file src="src/ios/GoogleMaps/PolylineOverlay.h" />
+        <source-file src="src/ios/GoogleMaps/PolylineOverlay.m" />
 
         <framework src="MapKit.framework" />
         <framework src="CoreLocation.framework" />
