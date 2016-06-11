@@ -192,7 +192,6 @@
         <framework src="MapKit.framework" />
         <framework src="CoreLocation.framework" />
         
-        </config-file>
         <config-file target="*-Info.plist" parent="NSLocationWhenInUseUsageDescription">
             <string>Show your location on the map</string>
         </config-file>
