@@ -1736,6 +1736,39 @@ NSDictionary *initOptions;
 }
 */
 
+- (GMSCircle *)getCircleByKey: (NSString *)key
+{
+    return [self.overlayManager objectForKey:key];
+}
+
+- (GMSMarker *)getMarkerByKey: (NSString *)key
+{
+    return [self.overlayManager objectForKey:key];
+}
+
+- (GMSPolygon *)getPolygonByKey: (NSString *)key
+{
+    return [self.overlayManager objectForKey:key];
+}
+
+- (GMSPolyline *)getPolylineByKey: (NSString *)key
+{
+    return [self.overlayManager objectForKey:key];
+}
+- (GMSTileLayer *)getTileLayerByKey: (NSString *)key
+{
+    return [self.overlayManager objectForKey:key];
+}
+- (GMSGroundOverlay *)getGroundOverlayByKey: (NSString *)key
+{
+    return [self.overlayManager objectForKey:key];
+}
+- (UIImage *)getUIImageByKey:(NSString *)key {
+    return [self.overlayManager objectForKey:key];
+}
+
+#pragma mark - Remove Object For Key Method
+
 - (void)removeObjectForKey: (NSString *)key
 {
   [self.overlayManager removeObjectForKey:key];

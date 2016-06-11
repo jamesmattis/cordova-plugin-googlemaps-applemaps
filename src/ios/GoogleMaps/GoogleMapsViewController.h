@@ -30,7 +30,6 @@
 @property (nonatomic) CGRect screenSize;
 @property (nonatomic) BOOL debuggable;
 
-
 //- (UIView *)mapView:(GMSMapView *)mapView markerInfoWindow:(GMSMarker *)marker;
 - (id)initWithOptions:(NSDictionary *) options;
 
@@ -43,9 +42,6 @@
 - (NSInteger)zoom;
 - (void)setCenterCoordinate:(CLLocationCoordinate2D)center zoom:(NSInteger)zoom animated:(BOOL)animated;
 
-// Old Methods
-
-/*
 - (GMSCircle *)getCircleByKey: (NSString *)key;
 - (GMSMarker *)getMarkerByKey: (NSString *)key;
 - (GMSPolygon *)getPolygonByKey: (NSString *)key;
@@ -53,7 +49,8 @@
 - (GMSTileLayer *)getTileLayerByKey: (NSString *)key;
 - (GMSGroundOverlay *)getGroundOverlayByKey: (NSString *)key;
 - (UIImage *)getUIImageByKey: (NSString *)key;
-*/
+
+// Old Methods
 
 - (void)updateMapViewLayout;
 
