@@ -79,6 +79,9 @@
   [result setObject:id forKey:@"id"];
   [result setObject:[NSString stringWithFormat:@"%lu", (unsigned long)polygon.hash] forKey:@"hashCode"];
      */
+    
+    NSMutableDictionary *result = [[NSMutableDictionary alloc] init];
+
   CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:result];
   [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
 }

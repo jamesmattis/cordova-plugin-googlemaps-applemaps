@@ -79,6 +79,11 @@
         callback(nil);
     }
      */
+    
+    NSMutableDictionary *result = [[NSMutableDictionary alloc] init];
+    
+    CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:result];
+    [self_.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
 }
 
 - (void)_setImage:(GMSGroundOverlay *)layer urlStr:(NSString *)urlStr completionHandler:(MYCompletionHandler)completionHandler {

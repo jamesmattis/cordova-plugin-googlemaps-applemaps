@@ -49,8 +49,10 @@
   [result setObject:[NSString stringWithFormat:@"%lu", (unsigned long)circle.hash] forKey:@"hashCode"];
      */
     
-  CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:result];
-  [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+    NSMutableDictionary *result = [[NSMutableDictionary alloc] init];
+    
+    CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:result];
+    [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
 }
 /**
  * Set center

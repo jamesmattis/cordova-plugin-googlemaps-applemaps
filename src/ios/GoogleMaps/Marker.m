@@ -72,7 +72,7 @@
 
     if (url)
     {
-        marker.icon = iconURL;
+        marker.iconURL = url;
     }
     
     /*
@@ -214,6 +214,8 @@
 {
     //self.mapCtrl.map.selectedMarker = nil;
     
+    MarkerAnnotation *marker = [self.mapCtrl.overlayManager objectForKey:hashCode];
+
     if (marker)
     {
         [self.mapCtrl.map deselectAnnotation:marker animated:YES];
@@ -230,6 +232,9 @@
 {
     NSString *markerKey = [command.arguments objectAtIndex:1];
 
+    MarkerAnnotation *marker = [self.mapCtrl.overlayManager objectForKey:markerKey];
+
+    /*
     GMSMarker *marker = [self.mapCtrl.overlayManager objectForKey:markerKey];
     NSNumber *latitude = @0.0;
     NSNumber *longitude = @0.0;
@@ -237,10 +242,16 @@
         latitude = [NSNumber numberWithFloat: marker.position.latitude];
         longitude = [NSNumber numberWithFloat: marker.position.longitude];
     }
+    
     NSMutableDictionary *json = [NSMutableDictionary dictionary];
     [json setObject:latitude forKey:@"lat"];
     [json setObject:longitude forKey:@"lng"];
-
+     */
+    
+    NSMutableDictionary *json = [NSMutableDictionary dictionary];
+    [json setObject:@(marker.coordinate.latitude) forKey:@"lat"];
+    [json setObject:@(marker.coordinate.longitude) forKey:@"lng"];
+    
     CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:json];
     [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
 }
