@@ -34,7 +34,7 @@
   "author": "Masashi Katsumata, Hirbod Mirjavadi, James Mattis (Apple Maps)“,
   "license": "Apache 2.0",
   "bugs": {
-    "url": "https://github.com/jamesmattis/cordoba-plugin-googlemaps-applemaps/issues"
+    "url": "https://github.com/jamesmattis/cordova-plugin-googlemaps-applemaps/issues"
   },
-  "homepage": "https://github.com/jamesmattis/cordoba-plugin-googlemaps-applemaps#readme"
+  "homepage": "https://github.com/jamesmattis/cordova-plugin-googlemaps-applemaps#readme"
 }

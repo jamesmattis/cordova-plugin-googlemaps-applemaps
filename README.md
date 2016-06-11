@@ -11,7 +11,7 @@ Both [PhoneGap](http://phonegap.com/) and [Apache Cordova](http://cordova.apache
 $ cordova plugin rm plugin.google.maps
 $ cordova plugin rm cordova-plugin-googlemaps
 $ cordova plugin cordova plugin rm com.googlemaps.ios
-$ cordova plugin add https://github.com/jamesmattis/cordoba-plugin-googlemaps-applemaps
+$ cordova plugin add https://github.com/jamesmattis/cordova-plugin-googlemaps-applemaps
 $ cordova run ios
 ```
 

@@ -7,8 +7,8 @@
 
 
     <description>Google Maps native SDK for Android and iOS (Apple Maps!)</description>
-    <repo>https://github.com/jamesmattis/cordoba-plugin-googlemaps-applemaps</repo>
-    <issue>https://github.com/jamesmattis/cordoba-plugin-googlemaps-applemaps/issues</issue>
+    <repo>https://github.com/jamesmattis/cordobva-plugin-googlemaps-applemaps</repo>
+    <issue>https://github.com/jamesmattis/cordova-plugin-googlemaps-applemaps/issues</issue>
 
     <license>Apache 2.0</license>
 
@@ -24,10 +24,10 @@
 
         <info>
              In order to run this plugin, you need to obtain Google Maps API key for Android.
-             Visit https://github.com/jamesmattis/cordoba-plugin-googlemaps-applemaps/wiki/Installation
+             Visit https://github.com/jamesmattis/cordobva-plugin-googlemaps-applemaps/wiki/Installation
 
              Check our release notes.
-             https://github.com/jamesmattis/cordoba-plugin-googlemaps-applemaps/wiki/Release-Notes
+             https://github.com/jamesmattis/cordobva-plugin-googlemaps-applemaps/wiki/Release-Notes
         </info>
 
         <config-file target="res/xml/config.xml" parent="/*">
@@ -98,11 +98,11 @@
              
              Just kidding. This plugin replaces Google Maps with Native Apple Maps. You don't need any Google API Key
              
-             Visit https://github.com/jamesmattis/cordoba-plugin-googlemaps-applemaps/wiki/Installation
+             Visit https://github.com/jamesmattis/cordobva-plugin-googlemaps-applemaps/wiki/Installation
 
              Check our release notes.
              
-             https://github.com/jamesmattis/cordoba-plugin-googlemaps-applemaps/wiki/Release-Notes
+             https://github.com/jamesmattis/cordobva-plugin-googlemaps-applemaps/wiki/Release-Notes
         </info>
 
         <config-file target="config.xml" parent="/*">
