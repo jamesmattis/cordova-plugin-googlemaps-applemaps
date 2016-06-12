@@ -503,13 +503,18 @@
     //GMSMarker *marker = [self.mapCtrl getMarkerByKey: markerKey];
 
     MarkerAnnotation *marker = [self.mapCtrl getMarkerByKey: markerKey];
-
-    float latitude = [[command.arguments objectAtIndex:2] floatValue];
-    float longitude = [[command.arguments objectAtIndex:3] floatValue];
-    CLLocationCoordinate2D position = CLLocationCoordinate2DMake(latitude, longitude);
+    
+    if ([command.arguments objectAtIndex:2] && [command.arguments objectAtIndex:2] != [NSNull null] && [command.arguments objectAtIndex:3] && [command.arguments objectAtIndex:3] != [NSNull null] )
+    {
+        float latitude = [[command.arguments objectAtIndex:2] floatValue];
+        float longitude = [[command.arguments objectAtIndex:3] floatValue];
+        
+        CLLocationCoordinate2D position = CLLocationCoordinate2DMake(latitude, longitude);
+        
+        marker.coordinate = position;
+    }
+    
     //[marker setPosition:position];
-
-    marker.coordinate = position;
     
     CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
     [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
