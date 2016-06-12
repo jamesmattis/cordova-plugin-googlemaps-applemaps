@@ -82,7 +82,7 @@ NSDictionary *initOptions;
      if (jsonData)
          sourceArrayString = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
      
-     NSLog(@"triggerCameraEvent target: %@ json: %@ string: %@", target, json, sourceArrayString);
+     //NSLog(@"triggerCameraEvent target: %@ json: %@ string: %@", target, json, sourceArrayString);
      
      NSString* jsString = [NSString stringWithFormat:@"plugin.google.maps.Map._onCameraEvent('%@', %@);", eventName, sourceArrayString];
  
@@ -157,7 +157,7 @@ NSDictionary *initOptions;
 {
     self.didTap = YES;
     
-    NSLog(@"tap");
+    //NSLog(@"tap");
     CGPoint tapPoint = [gestureRecognizer locationInView:self.map];
     CLLocationCoordinate2D coordinate = [self.map convertPoint:tapPoint toCoordinateFromView:self.map];
     
@@ -166,7 +166,7 @@ NSDictionary *initOptions;
 
 -(void)longPress:(UIGestureRecognizer *)gestureRecognizer
 {
-    NSLog(@"longPress");
+    //NSLog(@"longPress");
     CGPoint tapPoint = [gestureRecognizer locationInView:self.map];
     CLLocationCoordinate2D coordinate = [self.map convertPoint:tapPoint toCoordinateFromView:self.map];
     
@@ -924,7 +924,7 @@ NSDictionary *initOptions;
         }
     }
     
-    NSLog(@"viewForAnno title %@ subtitle %@", annotation.title, annotation.subtitle);
+    //NSLog(@"viewForAnno title %@ subtitle %@", annotation.title, annotation.subtitle);
         
     annoView.annotation = annotation;
     annoView.canShowCallout = YES;

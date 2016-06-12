@@ -220,7 +220,7 @@
     [latLng setObject:@(latitude) forKey:@"lat"];
     [latLng setObject:@(longitude) forKey:@"lng"];
     
-    NSLog(@"GoogleMapsVC getCameraPosition latLng: %@", latLng);
+    //NSLog(@"GoogleMapsVC getCameraPosition latLng: %@", latLng);
   
     NSMutableDictionary *json = [NSMutableDictionary dictionary];
     [json setObject:@(zoom) forKey:@"zoom"];
@@ -242,8 +242,8 @@
     double angle = [[json valueForKey:@"tilt"] doubleValue];
     */
     
-#warning updateCameraPosition
-    NSLog(@"updateCameraPosition json: %@", json);
+//#warning updateCameraPosition
+    //NSLog(@"updateCameraPosition json: %@", json);
     
     double zoom = [[json valueForKey:@"zoom"] doubleValue];
     
@@ -309,9 +309,9 @@
                 }
             }
             
-            MKCoordinateSpan span = MKCoordinateSpanMake(1.45 * (maxLat - minLat), 1.45 * (maxLon - minLon));
+            MKCoordinateSpan span = MKCoordinateSpanMake(1.42 * (maxLat - minLat), 1.42 * (maxLon - minLon));
             
-            CLLocationCoordinate2D center = CLLocationCoordinate2DMake((maxLat - span.latitudeDelta / 2), maxLon - span.longitudeDelta / 2);
+            CLLocationCoordinate2D center = CLLocationCoordinate2DMake(0.5 * (maxLat + minLat), 0.5 * (maxLon + minLon));
             
             CLLocationDegrees currentLatitude = self.mapCtrl.map.region.center.latitude;
             CLLocationDegrees currentLongitude = self.mapCtrl.map.region.center.longitude;
@@ -1079,6 +1079,7 @@
 
 - (void)setPadding:(CDVInvokedUrlCommand *)command
 {
+    
     /*
   NSDictionary *paddingJson = [command.arguments objectAtIndex:1];
   float top = [[paddingJson objectForKey:@"top"] floatValue];
@@ -1086,6 +1087,9 @@
   float right = [[paddingJson objectForKey:@"right"] floatValue];
   float bottom = [[paddingJson objectForKey:@"bottom"] floatValue];
   
+    NSLog(@"setPadding top %f left %f right: %f bottom: %f", top, left, right, bottom);
+     */
+    /*
   UIEdgeInsets padding = UIEdgeInsetsMake(top, left, bottom, right);
   
   [self.mapCtrl.map setPadding:padding];

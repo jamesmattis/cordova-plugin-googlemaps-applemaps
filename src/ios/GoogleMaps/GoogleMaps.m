@@ -673,7 +673,7 @@
     [latLng setObject:[NSNumber numberWithFloat:location.coordinate.latitude] forKey:@"lat"];
     [latLng setObject:[NSNumber numberWithFloat:location.coordinate.longitude] forKey:@"lng"];
 
-    NSLog(@"GoogleMaps manager didUpdateLocations latLng: %@", latLng);
+    //NSLog(@"GoogleMaps manager didUpdateLocations latLng: %@", latLng);
     NSMutableDictionary *json = [NSMutableDictionary dictionary];
     [json setObject:[NSNumber numberWithBool:YES] forKey:@"status"];
 
