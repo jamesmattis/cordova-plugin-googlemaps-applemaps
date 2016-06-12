@@ -209,7 +209,7 @@
                 latitude = 0.0;
             if (isnan(longitude))
                 longitude = 0.0;
-            if (isnan(zoom) || zoom < 0.0)
+            if (isnan(zoom) || zoom <= 0.0)
                 zoom = 1.0;
         }
     }
@@ -244,9 +244,12 @@
     */
     
 #warning updateCameraPosition
-    //NSLog(@"updateCameraPosition json: %@", json);
+    NSLog(@"updateCameraPosition json: %@", json);
     
     double zoom = [[json valueForKey:@"zoom"] doubleValue];
+    
+    if (zoom <= 0.0)
+        zoom = 1.0;
   
     NSDictionary *latLng = nil;
     float latitude = 0.0;

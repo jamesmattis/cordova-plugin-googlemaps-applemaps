@@ -263,9 +263,18 @@
     [json setObject:longitude forKey:@"lng"];
      */
     
+    CLLocationDegrees latitude = 0.0;
+    CLLocationDegrees longitude = 0.0;
+
+    if (marker)
+    {
+        latitude = marker.coordinate.latitude;
+        longitude = marker.coordinate.longitude;
+    }
+    
     NSMutableDictionary *json = [NSMutableDictionary dictionary];
-    [json setObject:@(marker.coordinate.latitude) forKey:@"lat"];
-    [json setObject:@(marker.coordinate.longitude) forKey:@"lng"];
+    [json setObject:@(latitude) forKey:@"lat"];
+    [json setObject:@(longitude) forKey:@"lng"];
     
     CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:json];
     [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];

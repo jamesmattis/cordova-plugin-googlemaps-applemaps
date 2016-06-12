@@ -46,18 +46,36 @@ NSDictionary *initOptions;
  - (void)triggerCameraEvent: (NSString *)eventName position:(CLLocationCoordinate2D )position
  {
      NSMutableDictionary *target = [NSMutableDictionary dictionary];
-     [target setObject:@(position.latitude) forKey:@"lat"];
-     [target setObject:@(position.longitude) forKey:@"lng"];
+     
+     if (position.latitude)
+         [target setObject:@(position.latitude) forKey:@"lat"];
+     else
+         [target setObject:@(0.0) forKey:@"lat"];
+
+     if (position.longitude)
+         [target setObject:@(position.longitude) forKey:@"lng"];
+     else
+         [target setObject:@(0.0) forKey:@"lng"];
      
      NSMutableDictionary *json = [NSMutableDictionary dictionary];
      [json setObject:@(0.0) forKey:@"bearing"];
-     [json setObject:target forKey:@"target"];
      [json setObject:@(0.0) forKey:@"tilt"];
-     [json setObject:@((NSInteger)self.map.hash) forKey:@"hashCode"];
+     [json setObject:@((NSUInteger)self.map.hash) forKey:@"hashCode"];
      [json setObject:@(self.zoom) forKey:@"zoom"];
- 
+
+     if (target)
+         [json setObject:target forKey:@"target"];
+     else
+         [json setObject:@{@"lat" : @(0.0), @"lng" : @(0.0)} forKey:@"target"];
+
      NSData* jsonData = [NSJSONSerialization dataWithJSONObject:json options:0 error:nil];
-     NSString* sourceArrayString = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
+     NSString* sourceArrayString = @"";
+     
+     if (jsonData)
+         sourceArrayString = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
+     
+     NSLog(@"triggerCameraEvent target: %@ json: %@ string: %@", target, json, sourceArrayString);
+     
      NSString* jsString = [NSString stringWithFormat:@"plugin.google.maps.Map._onCameraEvent('%@', %@);", eventName, sourceArrayString];
  
      if ([self.webView respondsToSelector:@selector(stringByEvaluatingJavaScriptFromString:)])
