@@ -267,7 +267,7 @@ NSDictionary *initOptions;
     
     self.map = [[MKMapView alloc] initWithFrame:mapRect];
     
-    [self.map setRegion:MKCoordinateRegionMakeWithDistance(CLLocationCoordinate2DMake(0.0, 0.0), 2000.0, 2000.0)];
+    [self.map setRegion:MKCoordinateRegionMakeWithDistance(CLLocationCoordinate2DMake(0.0, 0.0), 2000.0, 2000.0) animated:NO];
     
     self.map.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
     
@@ -494,7 +494,18 @@ NSDictionary *initOptions;
             
             MKCoordinateRegion region = MKCoordinateRegionMake(CLLocationCoordinate2DMake(midLatitude, midLongitude), MKCoordinateSpanMake(latitudeDelta, longitudeDelta));
             
-            [self.map setRegion:region];
+            CLLocationDegrees currentLatitude = self.map.region.center.latitude;
+            CLLocationDegrees currentLongitude = self.map.region.center.longitude;
+            CLLocationDegrees currentSpanLatitude = self.map.region.span.latitudeDelta;
+            CLLocationDegrees currentSpanLongitude = self.map.region.span.latitudeDelta;
+            
+            if (currentLatitude != midLatitude ||
+                currentLongitude != midLongitude ||
+                currentSpanLatitude != latitudeDelta ||
+                currentSpanLongitude != longitudeDelta)
+            {
+                [self.map setRegion:region animated:NO];
+            }
         }
         else
         {
@@ -778,7 +789,18 @@ NSDictionary *initOptions;
     
     MKCoordinateSpan span = MKCoordinateSpanMake(0, 360 / pow(2, zoomLevel) * self.map.frame.size.width / 256);
     
-    [self.map setRegion:MKCoordinateRegionMake(centerCoordinate, span) animated:animated];
+    CLLocationDegrees currentLatitude = self.map.region.center.latitude;
+    CLLocationDegrees currentLongitude = self.map.region.center.longitude;
+    CLLocationDegrees currentSpanLatitude = self.map.region.span.latitudeDelta;
+    CLLocationDegrees currentSpanLongitude = self.map.region.span.latitudeDelta;
+    
+    if (currentLatitude != centerCoordinate.latitude ||
+        currentLongitude != centerCoordinate.latitude ||
+        currentSpanLatitude != span.latitudeDelta ||
+        currentSpanLongitude != span.latitudeDelta)
+    {
+        [self.map setRegion:MKCoordinateRegionMake(centerCoordinate, span) animated:animated];
+    }
 }
 
 #pragma mark - MKMapViewDelegate

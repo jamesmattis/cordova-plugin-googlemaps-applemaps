@@ -24,7 +24,6 @@
     float latitude = [[command.arguments objectAtIndex:1] floatValue];
     float longitude = [[command.arguments objectAtIndex:2] floatValue];
     
-    
     [self.mapCtrl.map setRegion:MKCoordinateRegionMake(CLLocationCoordinate2DMake(latitude, longitude), self.mapCtrl.map.region.span) animated:YES];
   
   //[self.mapCtrl.map animateToLocation:CLLocationCoordinate2DMake(latitude, longitude)];
@@ -277,7 +276,7 @@
             CLLocationDegrees maxLon = -180.0;
             
             NSArray *latLngList = [json objectForKey:@"target"];
-
+            
             for (NSInteger i = 0; i < latLngList.count; i++)
             {
                 latLng = latLngList[i];
@@ -285,12 +284,12 @@
                 if ([latLng valueForKey:@"lat"] && [latLng valueForKey:@"lat"] != [NSNull null])
                     latitude = [[latLng valueForKey:@"lat"] floatValue];
                 else
-                    latitude = 0.0;
+                    latitude = 0.5 * (minLat + maxLat);
                 
                 if ([latLng valueForKey:@"lng"] && [latLng valueForKey:@"lng"] != [NSNull null])
                     longitude = [[latLng valueForKey:@"lng"] floatValue];
                 else
-                    longitude = 0.0;
+                    longitude = 0.5 * (minLon + maxLon);
                 
                 if (latitude < minLat)
                 {
@@ -310,12 +309,23 @@
                 }
             }
             
-            MKCoordinateSpan span = MKCoordinateSpanMake(maxLat - minLat, maxLon - minLon);
+            MKCoordinateSpan span = MKCoordinateSpanMake(1.05 * (maxLat - minLat), 1.05 * (maxLon - minLon));
             
             CLLocationCoordinate2D center = CLLocationCoordinate2DMake((maxLat - span.latitudeDelta / 2), maxLon - span.longitudeDelta / 2);
             
-            [self.mapCtrl.map setRegion:MKCoordinateRegionMake(center, span)];
-
+            CLLocationDegrees currentLatitude = self.mapCtrl.map.region.center.latitude;
+            CLLocationDegrees currentLongitude = self.mapCtrl.map.region.center.longitude;
+            CLLocationDegrees currentSpanLatitude = self.mapCtrl.map.region.span.latitudeDelta;
+            CLLocationDegrees currentSpanLongitude = self.mapCtrl.map.region.span.latitudeDelta;
+            
+            if (currentLatitude != center.latitude ||
+                currentLongitude != center.latitude ||
+                currentSpanLatitude != span.latitudeDelta ||
+                currentSpanLongitude != span.latitudeDelta)
+            {
+                [self.mapCtrl.map setRegion:MKCoordinateRegionMake(center, span) animated:NO];
+            }
+            
             /*
             GMSMutablePath *path = [GMSMutablePath path];
             
@@ -350,7 +360,7 @@
                 longitude = [[latLng valueForKey:@"lng"] floatValue];
             
             [self.mapCtrl setCenterCoordinate:CLLocationCoordinate2DMake(latitude, longitude) zoom:zoom animated:animated];
-            
+
             /*
             cameraPosition = [GMSCameraPosition cameraWithLatitude:latitude
                                                          longitude:longitude
@@ -364,7 +374,7 @@
     {
         latitude = self.mapCtrl.map.centerCoordinate.latitude;
         longitude = self.mapCtrl.map.centerCoordinate.longitude;
-        
+
         [self.mapCtrl setCenterCoordinate:CLLocationCoordinate2DMake(latitude, longitude) zoom:zoom animated:animated];
 
         /*
@@ -375,6 +385,7 @@
                                                   viewingAngle:angle];
          */
     }
+    
     
   /*
   if ([json objectForKey:@"target"]) {
@@ -808,7 +819,18 @@
             
             MKCoordinateRegion region = MKCoordinateRegionMake(CLLocationCoordinate2DMake(midLatitude, midLongitude), MKCoordinateSpanMake(latitudeDelta, longitudeDelta));
             
-            [self.mapCtrl.map setRegion:region];
+            CLLocationDegrees currentLatitude = self.mapCtrl.map.region.center.latitude;
+            CLLocationDegrees currentLongitude = self.mapCtrl.map.region.center.longitude;
+            CLLocationDegrees currentSpanLatitude = self.mapCtrl.map.region.span.latitudeDelta;
+            CLLocationDegrees currentSpanLongitude = self.mapCtrl.map.region.span.latitudeDelta;
+            
+            if (currentLatitude != midLatitude ||
+                currentLongitude != midLongitude ||
+                currentSpanLatitude != latitudeDelta ||
+                currentSpanLongitude != longitudeDelta)
+            {
+                [self.mapCtrl.map setRegion:region animated:NO];
+            }
         }
         else
         {
