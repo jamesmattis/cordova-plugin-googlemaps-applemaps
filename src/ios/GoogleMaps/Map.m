@@ -309,7 +309,7 @@
                 }
             }
             
-            MKCoordinateSpan span = MKCoordinateSpanMake(1.05 * (maxLat - minLat), 1.05 * (maxLon - minLon));
+            MKCoordinateSpan span = MKCoordinateSpanMake(1.45 * (maxLat - minLat), 1.45 * (maxLon - minLon));
             
             CLLocationCoordinate2D center = CLLocationCoordinate2DMake((maxLat - span.latitudeDelta / 2), maxLon - span.longitudeDelta / 2);
             
