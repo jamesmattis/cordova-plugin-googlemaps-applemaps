@@ -18,6 +18,8 @@
 
 -(void)imageForAnnotation:(MarkerAnnotation *)annotation imageBlock:(void( ^ )(UIImage* image))imageBlock;
 
+@property (assign, nonatomic) BOOL didTap;
+
 @end
 
 @implementation GoogleMapsViewController
@@ -46,7 +48,7 @@ NSDictionary *initOptions;
      NSMutableDictionary *target = [NSMutableDictionary dictionary];
      [target setObject:@(position.latitude) forKey:@"lat"];
      [target setObject:@(position.longitude) forKey:@"lng"];
- 
+     
      NSMutableDictionary *json = [NSMutableDictionary dictionary];
      [json setObject:@(0.0) forKey:@"bearing"];
      [json setObject:target forKey:@"target"];
@@ -127,6 +129,9 @@ NSDictionary *initOptions;
 
 -(void)tap:(UIGestureRecognizer *)gestureRecognizer
 {
+    self.didTap = YES;
+    
+    NSLog(@"tap");
     CGPoint tapPoint = [gestureRecognizer locationInView:self.map];
     CLLocationCoordinate2D coordinate = [self.map convertPoint:tapPoint toCoordinateFromView:self.map];
     
@@ -135,6 +140,7 @@ NSDictionary *initOptions;
 
 -(void)longPress:(UIGestureRecognizer *)gestureRecognizer
 {
+    NSLog(@"longPress");
     CGPoint tapPoint = [gestureRecognizer locationInView:self.map];
     CLLocationCoordinate2D coordinate = [self.map convertPoint:tapPoint toCoordinateFromView:self.map];
     
@@ -175,11 +181,13 @@ NSDictionary *initOptions;
   [super loadView];
   [self updateMapViewLayout];
 }
+
 - (void)updateMapViewLayout {
-  
-  if (self.isFullScreen == NO) {
-    [self.view setFrameWithDictionary:self.embedRect];
-  }
+    
+    if (self.isFullScreen == NO)
+    {
+        [self.view setFrameWithDictionary:self.embedRect];
+    }
 }
 
 - (void)viewDidLoad
@@ -194,6 +202,8 @@ NSDictionary *initOptions;
     // Initialize
     //------------
     self.overlayManager = [NSMutableDictionary dictionary];
+    
+    self.didTap = NO;
     
     //------------------
     // Create a map view
@@ -219,17 +229,27 @@ NSDictionary *initOptions;
                                   viewingAngle:[[cameraOpts objectForKey:@"tilt"] doubleValue]];
     */
     
-    // Create MKMapView
-    
-    self.map = [[MKMapView alloc] init];
-    
     // Set Map Frame
     
     CGRect pluginRect = self.view.frame;
     int marginBottom = 0;
     CGRect mapRect = CGRectMake(0, 0, pluginRect.size.width, pluginRect.size.height  - marginBottom);
-    self.map.frame = mapRect;
+
+    // Create MKMapView
+    
+    // Kigali, Rwanda -1.964748, 30.105917
+    
+    self.map = [[MKMapView alloc] initWithFrame:mapRect];
+    
+    [self.map setRegion:MKCoordinateRegionMakeWithDistance(CLLocationCoordinate2DMake(0.0, 0.0), 2000.0, 2000.0)];
+    
     self.map.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+    
+    // Set Map Options
+    
+    self.map.multipleTouchEnabled   = YES;
+    self.map.userInteractionEnabled = YES;
+    self.map.showsUserLocation = YES;
     
     // Set Map Delegate
     
@@ -238,8 +258,6 @@ NSDictionary *initOptions;
     // Add Map as Subview of View
     
     [self.view addSubview:self.map];
-    
-    NSLog(@"add map to self.view subviews %@", self.view.subviews);
     
     // Init Tap & Long Press Recognizers
     
@@ -344,7 +362,6 @@ NSDictionary *initOptions;
         {
             NSArray *latLngList = [cameraOpts objectForKey:@"target"];
             
-
             float minLatitude = 0.0;
             float maxLatitude = 0.0;
             float minLongitude = 0.0;
@@ -460,26 +477,21 @@ NSDictionary *initOptions;
             float latitude = [[latLng valueForKey:@"lat"] floatValue];
             float longitude = [[latLng valueForKey:@"lng"] floatValue];
             
-            [self.map setCenterCoordinate:CLLocationCoordinate2DMake(latitude, longitude)];
-            
             float zoom = [[cameraOpts valueForKey:@"zoom"] floatValue];
             
-            [self setZoom:zoom];
+            [self setCenterCoordinate:CLLocationCoordinate2DMake(latitude, longitude) zoom:zoom animated:NO];
+
         }
     }
     else
     {
-        [self.map setCenterCoordinate:CLLocationCoordinate2DMake(0.0, 0.0)];
-        
         float zoom = [[cameraOpts valueForKey:@"zoom"] floatValue];
         
-        [self setZoom:zoom];
+        [self setCenterCoordinate:CLLocationCoordinate2DMake(0.0, 0.0) zoom:zoom animated:NO];
     }
     
     // Set Controls
     
-    BOOL isEnabled = NO;
-
     NSDictionary *controls = [initOptions objectForKey:@"controls"];
     
     if (controls)
@@ -714,7 +726,14 @@ NSDictionary *initOptions;
 
 - (void)setZoom:(NSInteger)zoom
 {
-    [self setCenterCoordinate:self.map.centerCoordinate zoom:zoom animated:NO];
+    NSInteger zoomLevel = zoom;
+    
+    if (zoom <= 0.0)
+    {
+        zoomLevel = 1;
+    }
+    
+    [self setCenterCoordinate:self.map.centerCoordinate zoom:zoomLevel animated:NO];
 }
 
 - (NSInteger)zoom
@@ -724,7 +743,15 @@ NSDictionary *initOptions;
 
 - (void)setCenterCoordinate:(CLLocationCoordinate2D)centerCoordinate zoom:(NSInteger)zoom animated:(BOOL)animated
 {
-    MKCoordinateSpan span = MKCoordinateSpanMake(0, 360 / pow(2, zoom) * self.map.frame.size.width / 256);
+    NSInteger zoomLevel = zoom;
+    
+    if (zoom <= 0.0)
+    {
+        zoomLevel = 1;
+    }
+    
+    MKCoordinateSpan span = MKCoordinateSpanMake(0, 360 / pow(2, zoomLevel) * self.map.frame.size.width / 256);
+    
     [self.map setRegion:MKCoordinateRegionMake(centerCoordinate, span) animated:animated];
 }
 
@@ -735,6 +762,9 @@ NSDictionary *initOptions;
 - (void)mapView:(MKMapView *)mapView regionWillChangeAnimated:(BOOL)animated
 {
     BOOL gesture = NO;
+    
+    if (self.didTap)
+        gesture = YES;
     
     dispatch_queue_t gueue = dispatch_queue_create("plugin.google.maps.Map._onMapEvent", NULL);
     dispatch_sync(gueue, ^{
@@ -755,34 +785,37 @@ NSDictionary *initOptions;
 - (void)mapView:(MKMapView *)mapView regionDidChangeAnimated:(BOOL)animated
 {
     [self triggerCameraEvent:@"camera_change" position:mapView.region.center];
+    
+    if (self.didTap)
+        self.didTap = NO;
 }
 
 #pragma mark - Loading the Map Data
 
 - (void)mapViewWillStartLoadingMap:(MKMapView *)mapView
 {
-    NSLog(@"mapViewWillStartLoadingMap");
+    //NSLog(@"mapViewWillStartLoadingMap");
 }
 
 - (void)mapViewDidFinishLoadingMap:(MKMapView *)mapView
 {
-    NSLog(@"mapViewDidFinishLoadingMap");
+    //NSLog(@"mapViewDidFinishLoadingMap");
 }
 
 - (void)mapViewDidFailLoadingMap:(MKMapView *)mapView
                        withError:(NSError *)error
 {
-    NSLog(@"mapViewDidFailLoadingMap error: %@", error.debugDescription);
+    //NSLog(@"mapViewDidFailLoadingMap error: %@", error.debugDescription);
 }
 
 - (void)mapViewWillStartRenderingMap:(MKMapView *)mapView
 {
-    NSLog(@"mapViewWillStartRenderingMap");
+    //NSLog(@"mapViewWillStartRenderingMap");
 }
 
 - (void)mapViewDidFinishRenderingMap:(MKMapView *)mapView fullyRendered:(BOOL)fullyRendered
 {
-    NSLog(@"mapViewDidFinishRenderingMap");
+    //NSLog(@"mapViewDidFinishRenderingMap");
 }
 
 #pragma mark - Tracking the User Location
@@ -843,6 +876,8 @@ NSDictionary *initOptions;
         }
     }
     
+    NSLog(@"viewForAnno title %@ subtitle %@", annotation.title, annotation.subtitle);
+        
     annoView.annotation = annotation;
     annoView.canShowCallout = YES;
     annoView.draggable = marker.draggable;

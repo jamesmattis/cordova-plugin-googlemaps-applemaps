@@ -193,12 +193,13 @@
 #else
         Map *mapClass = [[NSClassFromString(@"Map")alloc] initWithWebView:self.webView];
 #endif
+        
         mapClass.commandDelegate = self.commandDelegate;
         [mapClass setGoogleMapsViewController:self.mapCtrl];
         [self.mapCtrl.plugins setObject:mapClass forKey:@"Map"];
 
-
         if ([command.arguments count] == 3) {
+            
             [self.mapCtrl.view removeFromSuperview];
             self.mapCtrl.isFullScreen = NO;
             self.pluginLayer.mapCtrl = self.mapCtrl;
@@ -457,7 +458,7 @@
         [self.pluginLayer putHTMLElement:elemId size:elemSize];
         [self.pluginScrollView.debugView putHTMLElement:elemId size:elemSize];
     }
-
+    
     [self.mapCtrl updateMapViewLayout];
 }
 
@@ -466,6 +467,7 @@
  * Show the map window
  */
 - (void)showDialog:(CDVInvokedUrlCommand *)command {
+    
     if (self.mapCtrl.isFullScreen == YES) {
         return;
     }
@@ -664,21 +666,25 @@
 }
 
 -(void)locationManager:(CLLocationManager *)manager didUpdateLocations:(NSArray *)locations {
+    
+    CLLocation *location = locations.lastObject;
+    
     NSMutableDictionary *latLng = [NSMutableDictionary dictionary];
-    [latLng setObject:[NSNumber numberWithFloat:self.locationManager.location.coordinate.latitude] forKey:@"lat"];
-    [latLng setObject:[NSNumber numberWithFloat:self.locationManager.location.coordinate.longitude] forKey:@"lng"];
+    [latLng setObject:[NSNumber numberWithFloat:location.coordinate.latitude] forKey:@"lat"];
+    [latLng setObject:[NSNumber numberWithFloat:location.coordinate.longitude] forKey:@"lng"];
 
+    NSLog(@"GoogleMaps manager didUpdateLocations latLng: %@", latLng);
     NSMutableDictionary *json = [NSMutableDictionary dictionary];
     [json setObject:[NSNumber numberWithBool:YES] forKey:@"status"];
 
     [json setObject:latLng forKey:@"latLng"];
-    [json setObject:[NSNumber numberWithFloat:[self.locationManager.location speed]] forKey:@"speed"];
-    [json setObject:[NSNumber numberWithFloat:[self.locationManager.location altitude]] forKey:@"altitude"];
+    [json setObject:[NSNumber numberWithFloat:[location speed]] forKey:@"speed"];
+    [json setObject:[NSNumber numberWithFloat:[location altitude]] forKey:@"altitude"];
 
     //todo: calcurate the correct accuracy based on horizontalAccuracy and verticalAccuracy
-    [json setObject:[NSNumber numberWithFloat:[self.locationManager.location horizontalAccuracy]] forKey:@"accuracy"];
-    [json setObject:[NSNumber numberWithDouble:[self.locationManager.location.timestamp timeIntervalSince1970]] forKey:@"time"];
-    [json setObject:[NSNumber numberWithInteger:[self.locationManager.location hash]] forKey:@"hashCode"];
+    [json setObject:[NSNumber numberWithFloat:[location horizontalAccuracy]] forKey:@"accuracy"];
+    [json setObject:[NSNumber numberWithDouble:[location.timestamp timeIntervalSince1970]] forKey:@"time"];
+    [json setObject:[NSNumber numberWithInteger:[location hash]] forKey:@"hashCode"];
 
     for (CDVInvokedUrlCommand *command in self.locationCommandQueue) {
         CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:json];

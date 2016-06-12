@@ -31,17 +31,30 @@
     
     //GMSMarker *marker = [GMSMarker markerWithPosition:position];
 
-    // Create Marker Anotation
+    // Create Marker Anotation & Set Coordinate
     
     MarkerAnnotation *marker = [[MarkerAnnotation alloc] init];
     
-    if ([json valueForKey:@"title"]) {
+    marker.coordinate = position;
+    
+    if ([json valueForKey:@"title"])
+    {
         [marker setTitle: [json valueForKey:@"title"]];
     }
-    if ([json valueForKey:@"snippet"]) {
+    else
+    {
+        [marker setTitle:@""];
+    }
+    if ([json valueForKey:@"snippet"])
+    {
         [marker setSubtitle: [json valueForKey:@"snippet"]];
     }
-    if ([json valueForKey:@"draggable"]) {
+    else
+    {
+        [marker setSubtitle:@""];
+    }
+    if ([json valueForKey:@"draggable"])
+    {
         [marker setDraggable:[[json valueForKey:@"draggable"] boolValue]];
     }
 
@@ -175,6 +188,10 @@
     
     CDVPluginResult* pluginResult = nil;
     
+    NSMutableDictionary *result = [[NSMutableDictionary alloc] init];
+    [result setObject:id forKey:@"id"];
+    [result setObject:[NSString stringWithFormat:@"%lu", (unsigned long)marker.hash] forKey:@"hashCode"];
+    
     pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:result];
     
     [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
@@ -214,11 +231,9 @@
 {
     //self.mapCtrl.map.selectedMarker = nil;
     
-    MarkerAnnotation *marker = [self.mapCtrl.overlayManager objectForKey:hashCode];
-
-    if (marker)
+    for (MKPointAnnotation *annotation in self.mapCtrl.map.selectedAnnotations)
     {
-        [self.mapCtrl.map deselectAnnotation:marker animated:YES];
+        [self.mapCtrl.map deselectAnnotation:annotation animated:YES];
     }
     
     CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
@@ -271,6 +286,8 @@
     }
      */
     
+    Boolean isOpen = false;
+
     CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsBool:isOpen];
     [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
 }
