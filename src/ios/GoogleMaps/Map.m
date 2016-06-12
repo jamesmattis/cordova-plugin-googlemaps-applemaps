@@ -271,20 +271,51 @@
 
         if ([targetClsName isEqualToString:@"__NSCFArray"] || [targetClsName isEqualToString:@"__NSArrayM"] )
         {
-            // int i = 0;
+            CLLocationDegrees minLat = 90.0;
+            CLLocationDegrees maxLat = -90.0;
+            CLLocationDegrees minLon = 180.0;
+            CLLocationDegrees maxLon = -180.0;
             
             NSArray *latLngList = [json objectForKey:@"target"];
+
+            for (NSInteger i = 0; i < latLngList.count; i++)
+            {
+                latLng = latLngList[i];
+                
+                if ([latLng valueForKey:@"lat"] && [latLng valueForKey:@"lat"] != [NSNull null])
+                    latitude = [[latLng valueForKey:@"lat"] floatValue];
+                else
+                    latitude = 0.0;
+                
+                if ([latLng valueForKey:@"lng"] && [latLng valueForKey:@"lng"] != [NSNull null])
+                    longitude = [[latLng valueForKey:@"lng"] floatValue];
+                else
+                    longitude = 0.0;
+                
+                if (latitude < minLat)
+                {
+                    minLat = latitude;
+                }
+                if (longitude < minLon)
+                {
+                    minLon = longitude;
+                }
+                if (latitude > maxLat)
+                {
+                    maxLat = latitude;
+                }
+                if (longitude > maxLon)
+                {
+                    maxLon = longitude;
+                }
+            }
             
-            latLng = latLngList.lastObject;
+            MKCoordinateSpan span = MKCoordinateSpanMake(maxLat - minLat, maxLon - minLon);
             
-            NSLog(@"updateCameraPosition AAA latLng: %@ (%@ %@)", latLng, [latLng valueForKey:@"lat"], [latLng valueForKey:@"lng"]);
+            CLLocationCoordinate2D center = CLLocationCoordinate2DMake((maxLat - span.latitudeDelta / 2), maxLon - span.longitudeDelta / 2);
             
-            if ([latLng valueForKey:@"lat"] && [latLng valueForKey:@"lat"] != [NSNull null])
-                latitude = [[latLng valueForKey:@"lat"] floatValue];
-            
-            if ([latLng valueForKey:@"lng"] && [latLng valueForKey:@"lng"] != [NSNull null])
-                longitude = [[latLng valueForKey:@"lng"] floatValue];
-            
+            [self.mapCtrl.map setRegion:MKCoordinateRegionMake(center, span)];
+
             /*
             GMSMutablePath *path = [GMSMutablePath path];
             
@@ -318,6 +349,8 @@
             if ([latLng valueForKey:@"lng"] && [latLng valueForKey:@"lng"] != [NSNull null])
                 longitude = [[latLng valueForKey:@"lng"] floatValue];
             
+            [self.mapCtrl setCenterCoordinate:CLLocationCoordinate2DMake(latitude, longitude) zoom:zoom animated:animated];
+            
             /*
             cameraPosition = [GMSCameraPosition cameraWithLatitude:latitude
                                                          longitude:longitude
@@ -331,6 +364,8 @@
     {
         latitude = self.mapCtrl.map.centerCoordinate.latitude;
         longitude = self.mapCtrl.map.centerCoordinate.longitude;
+        
+        [self.mapCtrl setCenterCoordinate:CLLocationCoordinate2DMake(latitude, longitude) zoom:zoom animated:animated];
 
         /*
         cameraPosition = [GMSCameraPosition cameraWithLatitude:self.mapCtrl.map.camera.target.latitude
@@ -340,8 +375,6 @@
                                                   viewingAngle:angle];
          */
     }
-    
-    [self.mapCtrl setCenterCoordinate:CLLocationCoordinate2DMake(latitude, longitude) zoom:zoom animated:animated];
     
   /*
   if ([json objectForKey:@"target"]) {
