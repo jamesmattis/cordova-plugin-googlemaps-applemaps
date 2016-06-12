@@ -705,150 +705,147 @@
     
     NSDictionary *cameraOpts = [initOptions objectForKey:@"camera"];
     
-    if ([cameraOpts objectForKey:@"target"])
+    if ([initOptions objectForKey:@"camera"])
     {
-        NSString *targetClsName = NSStringFromClass([[cameraOpts objectForKey:@"target"] class]);
-
-        if ([targetClsName isEqualToString:@"__NSCFArray"] || [targetClsName isEqualToString:@"__NSArrayM"] )
+        if ([cameraOpts objectForKey:@"target"])
         {
-            NSArray *latLngList = [cameraOpts objectForKey:@"target"];
+            NSString *targetClsName = NSStringFromClass([[cameraOpts objectForKey:@"target"] class]);
             
-            float minLatitude = 0.0;
-            float maxLatitude = 0.0;
-            float minLongitude = 0.0;
-            float maxLongitude = 0.0;
-            float maxIndex = 0;
-            float minIndex = 0;
-            float latitudeDelta = 0.0;
-            float midLatitude = 0.0;
-            float longitudeDelta = 0.0;
-            float midLongitude = 0.0;
-            
-            float radiansConversion = (M_PI / 180.0);
-            
-            NSMutableArray *rotatedLongitudes = [[NSMutableArray alloc] init];
-            
-            for (NSInteger i = 0; i < [latLngList count]; i++)
+            if ([targetClsName isEqualToString:@"__NSCFArray"] || [targetClsName isEqualToString:@"__NSArrayM"] )
             {
-                NSDictionary *latLng = [latLngList objectAtIndex:i];
-                float latitude = [[latLng valueForKey:@"lat"] floatValue];
-                float longitude = [[latLng valueForKey:@"lng"] floatValue];
+                NSArray *latLngList = [cameraOpts objectForKey:@"target"];
                 
-                if (latitude < minLatitude)
-                    minLatitude = latitude;
-                if (latitude > maxLatitude)
-                    maxLatitude = latitude;
+                float minLatitude = 0.0;
+                float maxLatitude = 0.0;
+                float minLongitude = 0.0;
+                float maxLongitude = 0.0;
+                float maxIndex = 0;
+                float minIndex = 0;
+                float latitudeDelta = 0.0;
+                float midLatitude = 0.0;
+                float longitudeDelta = 0.0;
+                float midLongitude = 0.0;
                 
-                latitudeDelta = maxLatitude - minLatitude;
-                midLatitude = minLatitude + 0.5 * latitudeDelta;
+                float radiansConversion = (M_PI / 180.0);
                 
-                longitude += 180.0; // Rotate by 180 degrees
+                NSMutableArray *rotatedLongitudes = [[NSMutableArray alloc] init];
                 
-                [rotatedLongitudes addObject:@(longitude)];
-                
-                if (longitude < minLongitude)
+                for (NSInteger i = 0; i < [latLngList count]; i++)
                 {
-                    minLongitude = longitude ;
-                    minIndex = i;
-                }
-                if (longitude > maxLongitude)
-                {
-                    maxLongitude = longitude;
-                    maxIndex = i;
-                }
-            }
-            
-            // Check for 180th Meridian Crossing
-            
-            if ((cos(radiansConversion * maxLongitude) > 0 || cos(radiansConversion * minLongitude) > 0) && (signbit(sin(radiansConversion * maxLongitude)) != signbit(sin(radiansConversion * minLongitude))))
-            {
-                float maxRotatedLongitude = 0.0;
-                float minRotatedLongitude = 0.0;
-                NSInteger maxRotatedIndex = 0;
-                NSInteger minRotatedIndex = 0;
-                
-                for (NSInteger j = 0; j < [latLngList count]; j++)
-                {
-                    NSDictionary *latLng = [latLngList objectAtIndex:j];
+                    NSDictionary *latLng = [latLngList objectAtIndex:i];
+                    float latitude = [[latLng valueForKey:@"lat"] floatValue];
                     float longitude = [[latLng valueForKey:@"lng"] floatValue];
                     
+                    if (latitude < minLatitude)
+                        minLatitude = latitude;
+                    if (latitude > maxLatitude)
+                        maxLatitude = latitude;
+                    
+                    latitudeDelta = maxLatitude - minLatitude;
+                    midLatitude = minLatitude + 0.5 * latitudeDelta;
+                    
                     longitude += 180.0; // Rotate by 180 degrees
-                    longitude *= (radiansConversion);
-                    longitude = sin(longitude);
                     
-                    if (longitude < minRotatedLongitude)
+                    [rotatedLongitudes addObject:@(longitude)];
+                    
+                    if (longitude < minLongitude)
                     {
-                        minRotatedLongitude = longitude;
-                        minIndex = j;
+                        minLongitude = longitude ;
+                        minIndex = i;
                     }
-                    if (longitude > maxRotatedLongitude)
+                    if (longitude > maxLongitude)
                     {
-                        maxRotatedLongitude = longitude;
-                        maxIndex = j;
+                        maxLongitude = longitude;
+                        maxIndex = i;
                     }
                 }
                 
-                if (maxRotatedIndex != minIndex || minRotatedIndex != maxIndex)
+                // Check for 180th Meridian Crossing
+                
+                if ((cos(radiansConversion * maxLongitude) > 0 || cos(radiansConversion * minLongitude) > 0) && (signbit(sin(radiansConversion * maxLongitude)) != signbit(sin(radiansConversion * minLongitude))))
                 {
-                    // Swap Indicies
+                    float maxRotatedLongitude = 0.0;
+                    float minRotatedLongitude = 0.0;
+                    NSInteger maxRotatedIndex = 0;
+                    NSInteger minRotatedIndex = 0;
                     
-                    maxIndex = maxRotatedIndex;
-                    minIndex = minRotatedIndex;
+                    for (NSInteger j = 0; j < [latLngList count]; j++)
+                    {
+                        NSDictionary *latLng = [latLngList objectAtIndex:j];
+                        float longitude = [[latLng valueForKey:@"lng"] floatValue];
+                        
+                        longitude += 180.0; // Rotate by 180 degrees
+                        longitude *= (radiansConversion);
+                        longitude = sin(longitude);
+                        
+                        if (longitude < minRotatedLongitude)
+                        {
+                            minRotatedLongitude = longitude;
+                            minIndex = j;
+                        }
+                        if (longitude > maxRotatedLongitude)
+                        {
+                            maxRotatedLongitude = longitude;
+                            maxIndex = j;
+                        }
+                    }
+                    
+                    if (maxRotatedIndex != minIndex || minRotatedIndex != maxIndex)
+                    {
+                        // Swap Indicies
+                        
+                        maxIndex = maxRotatedIndex;
+                        minIndex = minRotatedIndex;
+                    }
+                    
+                    maxLongitude = [[rotatedLongitudes objectAtIndex:maxIndex] floatValue];
+                    minLongitude = [[rotatedLongitudes objectAtIndex:minIndex] floatValue];
+                    
+                    longitudeDelta = (360.0 - maxLongitude) + (minLongitude);
+                    midLongitude = (minLongitude - 180.0) - 0.5 * longitudeDelta;
+                    
+                    if (longitudeDelta < 0.0)
+                        longitudeDelta *= -1.0;
+                    
+                    if (midLongitude < -180.0)
+                        midLongitude = (maxLongitude - 180.0) + 0.5 *longitudeDelta;
+                }
+                else
+                {
+                    maxLongitude = [[rotatedLongitudes objectAtIndex:maxIndex] floatValue];
+                    minLongitude = [[rotatedLongitudes objectAtIndex:minIndex] floatValue];
+                    
+                    longitudeDelta = maxLongitude - minLongitude;
+                    midLongitude = (minLongitude - 180.0) + 0.5 * longitudeDelta;
                 }
                 
-                maxLongitude = [[rotatedLongitudes objectAtIndex:maxIndex] floatValue];
-                minLongitude = [[rotatedLongitudes objectAtIndex:minIndex] floatValue];
+                MKCoordinateRegion region = MKCoordinateRegionMake(CLLocationCoordinate2DMake(midLatitude, midLongitude), MKCoordinateSpanMake(latitudeDelta, longitudeDelta));
                 
-                longitudeDelta = (360.0 - maxLongitude) + (minLongitude);
-                midLongitude = (minLongitude - 180.0) - 0.5 * longitudeDelta;
+                CLLocationDegrees currentLatitude = self.mapCtrl.map.region.center.latitude;
+                CLLocationDegrees currentLongitude = self.mapCtrl.map.region.center.longitude;
+                CLLocationDegrees currentSpanLatitude = self.mapCtrl.map.region.span.latitudeDelta;
+                CLLocationDegrees currentSpanLongitude = self.mapCtrl.map.region.span.latitudeDelta;
                 
-                if (longitudeDelta < 0.0)
-                    longitudeDelta *= -1.0;
-                
-                if (midLongitude < -180.0)
-                    midLongitude = (maxLongitude - 180.0) + 0.5 *longitudeDelta;
+                if (currentLatitude != midLatitude ||
+                    currentLongitude != midLongitude ||
+                    currentSpanLatitude != latitudeDelta ||
+                    currentSpanLongitude != longitudeDelta)
+                {
+                    [self.mapCtrl.map setRegion:region animated:NO];
+                }
             }
             else
             {
-                maxLongitude = [[rotatedLongitudes objectAtIndex:maxIndex] floatValue];
-                minLongitude = [[rotatedLongitudes objectAtIndex:minIndex] floatValue];
+                NSMutableDictionary *latLng = [cameraOpts objectForKey:@"target"];
                 
-                longitudeDelta = maxLongitude - minLongitude;
-                midLongitude = (minLongitude - 180.0) + 0.5 * longitudeDelta;
-            }
-            
-            MKCoordinateRegion region = MKCoordinateRegionMake(CLLocationCoordinate2DMake(midLatitude, midLongitude), MKCoordinateSpanMake(latitudeDelta, longitudeDelta));
-            
-            CLLocationDegrees currentLatitude = self.mapCtrl.map.region.center.latitude;
-            CLLocationDegrees currentLongitude = self.mapCtrl.map.region.center.longitude;
-            CLLocationDegrees currentSpanLatitude = self.mapCtrl.map.region.span.latitudeDelta;
-            CLLocationDegrees currentSpanLongitude = self.mapCtrl.map.region.span.latitudeDelta;
-            
-            if (currentLatitude != midLatitude ||
-                currentLongitude != midLongitude ||
-                currentSpanLatitude != latitudeDelta ||
-                currentSpanLongitude != longitudeDelta)
-            {
-                [self.mapCtrl.map setRegion:region animated:NO];
+                float latitude = [[latLng valueForKey:@"lat"] floatValue];
+                float longitude = [[latLng valueForKey:@"lng"] floatValue];
+                
+                float zoom = [[cameraOpts valueForKey:@"zoom"] floatValue];
+                
+                [self.mapCtrl setCenterCoordinate:CLLocationCoordinate2DMake(latitude, longitude) zoom:zoom animated:NO];
             }
         }
-        else
-        {
-            NSMutableDictionary *latLng = [cameraOpts objectForKey:@"target"];
-            
-            float latitude = [[latLng valueForKey:@"lat"] floatValue];
-            float longitude = [[latLng valueForKey:@"lng"] floatValue];
-            
-            float zoom = [[cameraOpts valueForKey:@"zoom"] floatValue];
-            
-            [self.mapCtrl setCenterCoordinate:CLLocationCoordinate2DMake(latitude, longitude) zoom:zoom animated:NO];
-        }
-    }
-    else
-    {        
-        float zoom = [[cameraOpts valueForKey:@"zoom"] floatValue];
-                
-        [self.mapCtrl setCenterCoordinate:CLLocationCoordinate2DMake(0.0, 0.0) zoom:zoom animated:NO];
     }
     
     // Set Controls
