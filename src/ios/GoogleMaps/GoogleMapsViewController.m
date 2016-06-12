@@ -746,9 +746,9 @@ NSDictionary *initOptions;
 {
     NSInteger zoomLevel = zoom;
     
-    if (zoom <= 0.0)
+    if (zoom < 16)
     {
-        zoomLevel = 1;
+        zoomLevel = 16;
     }
     
     [self setCenterCoordinate:self.map.centerCoordinate zoom:zoomLevel animated:NO];
@@ -763,9 +763,9 @@ NSDictionary *initOptions;
 {
     NSInteger zoomLevel = zoom;
     
-    if (zoom <= 0.0)
+    if (zoom < 16)
     {
-        zoomLevel = 1;
+        zoomLevel = 16;
     }
     
     MKCoordinateSpan span = MKCoordinateSpanMake(0, 360 / pow(2, zoomLevel) * self.map.frame.size.width / 256);

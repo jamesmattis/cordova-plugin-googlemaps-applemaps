@@ -195,7 +195,7 @@
 {
     float latitude = 0.0;
     float longitude = 0.0;
-    float zoom = 1.0;
+    float zoom = 16.0;
     
     if (self.mapCtrl.map)
     {
@@ -209,8 +209,8 @@
                 latitude = 0.0;
             if (isnan(longitude))
                 longitude = 0.0;
-            if (isnan(zoom) || zoom <= 0.0)
-                zoom = 1.0;
+            if (isnan(zoom) || zoom < 16.0)
+                zoom = 16.0;
         }
     }
     
@@ -248,8 +248,8 @@
     
     double zoom = [[json valueForKey:@"zoom"] doubleValue];
     
-    if (zoom <= 0.0)
-        zoom = 1.0;
+    if (zoom < 16.0)
+        zoom = 16.0;
   
     NSDictionary *latLng = nil;
     float latitude = 0.0;
