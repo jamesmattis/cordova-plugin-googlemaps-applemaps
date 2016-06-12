@@ -47,20 +47,28 @@ NSDictionary *initOptions;
  {
      NSMutableDictionary *target = [NSMutableDictionary dictionary];
      
-     if (position.latitude)
+     if (position.latitude && !isnan(position.latitude))
          [target setObject:@(position.latitude) forKey:@"lat"];
      else
          [target setObject:@(0.0) forKey:@"lat"];
 
-     if (position.longitude)
+     if (position.longitude && !isnan(position.longitude))
          [target setObject:@(position.longitude) forKey:@"lng"];
      else
          [target setObject:@(0.0) forKey:@"lng"];
      
+     NSUInteger hash = (NSUInteger)self.map.hash;
+     
+     if (isnan(hash))
+         hash = 0;
+     
+     if (isnan(self.zoom))
+         self.zoom = 16;
+     
      NSMutableDictionary *json = [NSMutableDictionary dictionary];
      [json setObject:@(0.0) forKey:@"bearing"];
      [json setObject:@(0.0) forKey:@"tilt"];
-     [json setObject:@((NSUInteger)self.map.hash) forKey:@"hashCode"];
+     [json setObject:@(hash) forKey:@"hashCode"];
      [json setObject:@(self.zoom) forKey:@"zoom"];
 
      if (target)
