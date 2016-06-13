@@ -103,14 +103,90 @@
   }
   
   // Reverse geocoding
+    
   if (position && address == nil) {
+      
+      /*
     if (!self.reverseGeocoder) {
       self.reverseGeocoder = [GMSGeocoder geocoder];
     }
-    
+    */
+      
+      if (!self.geocoder)
+          self.geocoder = [[CLGeocoder alloc] init];
+      
     NSDictionary *latLng = [json objectForKey:@"position"];
     CLLocationCoordinate2D position = CLLocationCoordinate2DMake([[latLng objectForKey:@"lat"] floatValue], [[latLng objectForKey:@"lng"] floatValue]);
+      
+      CLLocationDegrees latitude = [[latLng objectForKey:@"lat"] floatValue];
+      CLLocationDegrees longitude = [[latLng objectForKey:@"lng"] floatValue];
+
+      CLLocation *location = [[CLLocation alloc] initWithLatitude:latitude longitude:longitude];
+      
+      [self.geocoder reverseGeocodeLocation:location completionHandler:^(NSArray<CLPlacemark *> * _Nullable placemarks, NSError * _Nullable error) {
+          CDVPluginResult* pluginResult;
+          
+          if (error)
+          {
+              if (placemarks.count == 0)
+              {
+                  pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"Not found"];
+              }
+              else
+              {
+                  pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:error.description];
+              }
+          }
+          else
+          {
+              NSMutableArray *results = [NSMutableArray array];
+
+              NSString *countryCode;
+              
+              for (CLPlacemark *placemark in placemarks)
+              {
+                  NSMutableDictionary *result = [NSMutableDictionary dictionary];
+                  
+                  [result setObject:[NSNumber numberWithDouble:placemark.location.coordinate.latitude] forKey:@"lat"];
+                  [result setObject:[NSNumber numberWithDouble:placemark.location.coordinate.longitude] forKey:@"lng"];
+                  
+                  NSMutableDictionary *position = [NSMutableDictionary dictionary];
+                  
+                  [position setObject:[NSNumber numberWithDouble:placemark.location.coordinate.latitude] forKey:@"lat"];
+                  [position setObject:[NSNumber numberWithDouble:placemark.location.coordinate.longitude] forKey:@"lng"];
+                  
+                  [result setObject:position forKey:@"position"];
+                  
+                  [result setObject:[NSString stringWithFormat:@"%@", placemark.locality] forKey:@"locality"];
+                  [result setObject:[NSString stringWithFormat:@"%@", placemark.administrativeArea] forKey:@"adminArea"];
+                  [result setObject:[NSString stringWithFormat:@"%@", placemark.country] forKey:@"country"];
+                  countryCode = [self.codeForCountryDictionary objectForKey:placemark.country];
+                  [result setObject:[NSString stringWithFormat:@"%@", countryCode] forKey:@"countryCode"];
+                  [result setObject:@"" forKey:@"locale"];
+                  [result setObject:[NSString stringWithFormat:@"%@", placemark.postalCode] forKey:@"postalCode"];
+                  [result setObject:@"" forKey:@"subAdminArea"];
+                  [result setObject:[NSString stringWithFormat:@"%@", placemark.subLocality] forKey:@"subLocality"];
+                  [result setObject:@"" forKey:@"subThoroughfare"];
+                  [result setObject:[NSString stringWithFormat:@"%@", placemark.thoroughfare] forKey:@"thoroughfare"];
+                  
+                  NSString *addressLine0 = [NSString stringWithFormat:@"%@", placemark.name];
+                  NSString *addressLine1 = [NSString stringWithFormat:@"%@ %@", placemark.subThoroughfare, placemark.thoroughfare];
+                  NSString *addressLine2 = [NSString stringWithFormat:@"%@, %@ %@", placemark.locality, placemark.administrativeArea, placemark.country];
+
+                  NSMutableDictionary *extra = [NSMutableDictionary dictionary];
+                  [extra setObject:@[addressLine0, addressLine1, addressLine2] forKey:@"lines"];
+                  [result setObject:extra forKey:@"extra"];
+                  
+                  [results addObject:result];
+              }
+              
+              pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsArray:results];
+          }
+          
+          [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+      }];
     
+      /*
     [self.reverseGeocoder reverseGeocodeCoordinate:position completionHandler:^(GMSReverseGeocodeResponse *response, NSError *error) {
       CDVPluginResult* pluginResult;
       if (error) {
@@ -159,9 +235,10 @@
         pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsArray:results];
       };
       [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
-
-      
     }];
+       */
+      
+      
     /*
     [self.geocoder reverseGeocodeLocation:position completionHandler:^(NSArray *placemarks, NSError *error) {
       CDVPluginResult* pluginResult;
